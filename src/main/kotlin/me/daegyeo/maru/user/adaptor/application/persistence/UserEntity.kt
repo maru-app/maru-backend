@@ -26,5 +26,5 @@ class UserEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "user_id")
-    val userId: UUID? = null
+    val userId: UUID? = null,
 ) : AuditDateTimeEntity()
