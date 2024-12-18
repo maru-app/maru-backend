@@ -1,13 +1,15 @@
 package me.daegyeo.maru.user.application.domain
 
 import me.daegyeo.maru.shared.constant.Vendor
+import java.time.ZonedDateTime
+import java.util.UUID
 
 data class User(
-    val userId: String,
+    val userId: UUID,
     val email: String,
     val vendor: Vendor,
     val nickname: String,
-    val createdAt: String,
-    val updatedAt: String,
-    val deletedAt: String?,
+    val createdAt: ZonedDateTime,
+    val updatedAt: ZonedDateTime,
+    val deletedAt: ZonedDateTime?,
 )
