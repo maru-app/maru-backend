@@ -1,4 +1,4 @@
-package me.daegyeo.maru.user.adaptor.application.persistence
+package me.daegyeo.maru.user.application.persistence
 
 import jakarta.persistence.*
 import me.daegyeo.maru.shared.constant.Vendor

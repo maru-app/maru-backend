@@ -1,4 +1,4 @@
-package me.daegyeo.maru.user.adaptor.application.domain
+package me.daegyeo.maru.user.application.domain
 
 import me.daegyeo.maru.shared.constant.Vendor
 
