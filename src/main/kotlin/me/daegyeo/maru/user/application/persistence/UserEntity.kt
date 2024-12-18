@@ -12,6 +12,7 @@ import java.util.*
 @Table(name = "users")
 @SQLDelete(sql = "UPDATE users SET deleted_at = now() WHERE user_id = ?")
 @SQLRestriction("deleted_at IS NOT NULL")
+@Builder
 class UserEntity(
     @Column(nullable = false, unique = true)
     val email: String,
@@ -24,7 +25,7 @@ class UserEntity(
     val nickname: String,
 
     @Column(nullable = true, name = "deleted_at")
-    val deletedAt: ZonedDateTime,
+    val deletedAt: ZonedDateTime?,
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
