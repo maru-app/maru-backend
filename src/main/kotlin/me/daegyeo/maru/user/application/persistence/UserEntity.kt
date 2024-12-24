@@ -1,8 +1,8 @@
 package me.daegyeo.maru.user.application.persistence
 
 import jakarta.persistence.*
-import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.entity.AuditDateTimeEntity
+import me.daegyeo.maru.user.application.constant.Vendor
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
 import java.time.ZonedDateTime
