@@ -8,6 +8,7 @@ indent_size = 4
 insert_final_newline = true
 ij_kotlin_packages_to_use_import_on_demand = unset
 ktlint_standard_no-wildcard-imports = disabled
+ktlint_standard_package-name = disabled
 
 [*Entity.{kt,kts}]
 ktlint_standard_no-blank-line-in-list = disabled
