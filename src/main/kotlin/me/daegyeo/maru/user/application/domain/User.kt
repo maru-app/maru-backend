@@ -8,8 +8,8 @@ data class User(
     val userId: UUID,
     val email: String,
     val vendor: Vendor,
-    val nickname: String,
+    var nickname: String,
     val createdAt: ZonedDateTime,
     val updatedAt: ZonedDateTime,
-    val deletedAt: ZonedDateTime?,
+    var deletedAt: ZonedDateTime?,
 )

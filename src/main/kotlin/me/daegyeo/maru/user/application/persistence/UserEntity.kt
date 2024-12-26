@@ -21,10 +21,10 @@ class UserEntity(
     val vendor: Vendor,
 
     @Column(nullable = false)
-    val nickname: String,
+    var nickname: String,
 
     @Column(nullable = true, name = "deleted_at")
-    val deletedAt: ZonedDateTime?,
+    var deletedAt: ZonedDateTime?,
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
