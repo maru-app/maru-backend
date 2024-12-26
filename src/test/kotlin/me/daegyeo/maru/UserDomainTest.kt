@@ -3,11 +3,13 @@ package me.daegyeo.maru
 import me.daegyeo.maru.shared.exception.ServiceException
 import me.daegyeo.maru.user.application.constant.Vendor
 import me.daegyeo.maru.user.application.domain.User
+import me.daegyeo.maru.user.application.error.UserError
 import me.daegyeo.maru.user.application.port.`in`.dto.CreateUserUseCaseDto
 import me.daegyeo.maru.user.application.port.out.CreateUserPort
 import me.daegyeo.maru.user.application.port.out.ReadUserPort
 import me.daegyeo.maru.user.application.port.out.dto.CreateUserDto
 import me.daegyeo.maru.user.application.service.CreateUserService
+import me.daegyeo.maru.user.application.service.GetUserService
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -16,11 +18,13 @@ import org.mockito.junit.jupiter.MockitoExtension
 import java.time.ZonedDateTime
 import java.util.UUID
 
+@Suppress("NonAsciiCharacters")
 @ExtendWith(MockitoExtension::class)
 class UserDomainTest {
     private val createUserPort = mock(CreateUserPort::class.java)
     private val readUserPort = mock(ReadUserPort::class.java)
     private val createUserService = CreateUserService(createUserPort, readUserPort)
+    private val getUserService = GetUserService(readUserPort)
 
     @Test
     fun `이미 존재하는 이메일로 회원가입 시 오류를 반환함`() {
@@ -37,9 +41,11 @@ class UserDomainTest {
             ),
         )
 
-        assertThrows(ServiceException::class.java) {
-            createUserService.createUser(input)
-        }
+        val exception =
+            assertThrows(ServiceException::class.java) {
+                createUserService.createUser(input)
+            }
+        assert(exception.error == UserError.USER_ALREADY_EXISTS)
     }
 
     @Test
@@ -69,12 +75,68 @@ class UserDomainTest {
 
     @Test
     fun `존재하지 않는 사용자를 가져오면 오류를 반환함`() {
-        error("Not implemented")
+        val userId = UUID.randomUUID()
+        `when`(readUserPort.readUser(userId)).thenReturn(null)
+
+        val exception =
+            assertThrows(ServiceException::class.java) {
+                getUserService.getUser(userId)
+            }
+        assert(exception.error == UserError.USER_NOT_FOUND)
     }
 
     @Test
     fun `존재하는 사용자를 성공적으로 가져옴`() {
-        error("Not implemented")
+        val userId = UUID.randomUUID()
+        `when`(readUserPort.readUser(userId)).thenReturn(
+            User(
+                userId = userId,
+                email = "foobar@acme.com",
+                vendor = Vendor.GOOGLE,
+                nickname = "FooBar",
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+                deletedAt = null,
+            ),
+        )
+
+        val result = getUserService.getUser(userId)
+
+        verify(readUserPort).readUser(userId)
+        assert(result.userId == userId)
+    }
+
+    @Test
+    fun `존재하지 않는 이메일로 사용자를 가져오면 오류를 반환함`() {
+        val email = "notfound@acme.com"
+        `when`(readUserPort.readUserByEmail(email)).thenReturn(null)
+
+        val exception =
+            assertThrows(ServiceException::class.java) {
+                getUserService.getUserByEmail(email)
+            }
+        assert(exception.error == UserError.USER_NOT_FOUND)
+    }
+
+    @Test
+    fun `존재하는 이메일로 사용자를 성공적으로 가져옴`() {
+        val email = "foobar@acme.com"
+        `when`(readUserPort.readUserByEmail(email)).thenReturn(
+            User(
+                userId = UUID.randomUUID(),
+                email = email,
+                vendor = Vendor.GOOGLE,
+                nickname = "FooBar",
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+                deletedAt = null,
+            ),
+        )
+
+        val result = getUserService.getUserByEmail(email)
+
+        verify(readUserPort).readUserByEmail(email)
+        assert(result.email == email)
     }
 
     @Test
