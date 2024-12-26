@@ -166,6 +166,13 @@ class UserDomainTest {
 
     @Test
     fun `탈퇴한 사용자 정보를 가져오면 오류를 반환함`() {
-        error("Not implemented")
+        val email = "foobar@acme.com"
+        `when`(readUserPort.readUserByEmail(email)).thenReturn(null)
+
+        val exception =
+            assertThrows(ServiceException::class.java) {
+                getUserService.getUserByEmail(email)
+            }
+        assert(exception.error == UserError.USER_NOT_FOUND)
     }
 }
