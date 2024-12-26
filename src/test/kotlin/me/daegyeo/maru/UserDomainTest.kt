@@ -5,11 +5,15 @@ import me.daegyeo.maru.user.application.constant.Vendor
 import me.daegyeo.maru.user.application.domain.User
 import me.daegyeo.maru.user.application.error.UserError
 import me.daegyeo.maru.user.application.port.`in`.dto.CreateUserUseCaseDto
+import me.daegyeo.maru.user.application.port.`in`.dto.UpdateUserUseCaseDto
 import me.daegyeo.maru.user.application.port.out.CreateUserPort
 import me.daegyeo.maru.user.application.port.out.ReadUserPort
+import me.daegyeo.maru.user.application.port.out.UpdateUserPort
 import me.daegyeo.maru.user.application.port.out.dto.CreateUserDto
+import me.daegyeo.maru.user.application.port.out.dto.UpdateUserDto
 import me.daegyeo.maru.user.application.service.CreateUserService
 import me.daegyeo.maru.user.application.service.GetUserService
+import me.daegyeo.maru.user.application.service.UpdateUserService
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -23,8 +27,10 @@ import java.util.UUID
 class UserDomainTest {
     private val createUserPort = mock(CreateUserPort::class.java)
     private val readUserPort = mock(ReadUserPort::class.java)
+    private val updatedUserPort = mock(UpdateUserPort::class.java)
     private val createUserService = CreateUserService(createUserPort, readUserPort)
     private val getUserService = GetUserService(readUserPort)
+    private val updateUserService = UpdateUserService(updatedUserPort)
 
     @Test
     fun `이미 존재하는 이메일로 회원가입 시 오류를 반환함`() {
@@ -146,7 +152,47 @@ class UserDomainTest {
 
     @Test
     fun `사용자 정보를 성공적으로 수정함`() {
-        error("Not implemented")
+        val input = UpdateUserUseCaseDto(nickname = "NewNickname", deletedAt = null)
+        val userId = UUID.randomUUID()
+        `when`(
+            updatedUserPort.updateUser(
+                userId,
+                UpdateUserDto(nickname = "NewNickname", deletedAt = null),
+            ),
+        ).thenReturn(
+            User(
+                userId = userId,
+                email = "",
+                vendor = Vendor.GOOGLE,
+                nickname = "NewNickname",
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+                deletedAt = null,
+            ),
+        )
+
+        val result = updateUserService.updateUser(userId, input)
+
+        verify(updatedUserPort).updateUser(userId, UpdateUserDto(nickname = "NewNickname", deletedAt = null))
+        assert(result.nickname == "NewNickname")
+    }
+
+    @Test
+    fun `존재하지 않는 사용자 정보를 수정하면 오류를 반환함`() {
+        val input = UpdateUserUseCaseDto(nickname = "NewNickname", deletedAt = null)
+        val userId = UUID.randomUUID()
+        `when`(
+            updatedUserPort.updateUser(
+                userId,
+                UpdateUserDto(nickname = "NewNickname", deletedAt = null),
+            ),
+        ).thenReturn(null)
+
+        val exception =
+            assertThrows(ServiceException::class.java) {
+                updateUserService.updateUser(userId, input)
+            }
+        assert(exception.error == UserError.USER_NOT_FOUND)
     }
 
     @Test
