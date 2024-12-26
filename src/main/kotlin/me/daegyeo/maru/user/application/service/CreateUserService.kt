@@ -1,6 +1,8 @@
 package me.daegyeo.maru.user.application.service
 
+import me.daegyeo.maru.shared.exception.ServiceException
 import me.daegyeo.maru.user.application.domain.User
+import me.daegyeo.maru.user.application.error.UserError
 import me.daegyeo.maru.user.application.port.`in`.CreateUserUseCase
 import me.daegyeo.maru.user.application.port.`in`.dto.CreateUserUseCaseDto
 import me.daegyeo.maru.user.application.port.out.CreateUserPort
@@ -16,7 +18,7 @@ class CreateUserService(private val createUserPort: CreateUserPort, private val 
         val existsUser = readUserPort.readUserByEmail(input.email)
 
         if (existsUser != null) {
-            throw RuntimeException("User already exists")
+            throw ServiceException(UserError.USER_ALREADY_EXISTS)
         }
 
         val createUserDto =
