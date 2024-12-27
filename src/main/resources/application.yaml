@@ -25,6 +25,12 @@ spring:
                         scope:
                             - profile
                             - email
-
 oauth:
     redirect-url: ${OAUTH_REDIRECT_URL}
+jwt:
+    access-token:
+        secret: ${ACCESS_TOKEN_SECRET}
+        expiration: ${ACCESS_TOKEN_EXPIRATION}
+    register-token:
+        secret: ${REGISTER_TOKEN_SECRET}
+        expiration: ${REGISTER_TOKEN_EXPIRATION}
