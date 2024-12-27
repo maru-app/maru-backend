@@ -25,3 +25,6 @@ spring:
                         scope:
                             - profile
                             - email
+
+oauth:
+    redirect-url: ${OAUTH_REDIRECT_URL}
