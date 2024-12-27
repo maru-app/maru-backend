@@ -1,20 +1,18 @@
 package me.daegyeo.maru.auth.application.service
 
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.io.Decoders
-import io.jsonwebtoken.security.Keys
 import me.daegyeo.maru.auth.application.domain.AccessTokenPayload
 import me.daegyeo.maru.auth.application.domain.RegisterTokenPayload
 import me.daegyeo.maru.auth.application.port.`in`.GenerateJWTUseCase
+import me.daegyeo.maru.auth.application.util.KeyUtil
 import me.daegyeo.maru.shared.util.DateFormat
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.stereotype.Component
-import java.security.Key
+import org.springframework.stereotype.Service
 import java.time.Instant
 import java.util.Date
 
-@Component
-class GenerateJWTProvider : GenerateJWTUseCase {
+@Service
+class GenerateJWTService : GenerateJWTUseCase {
     @Value("\${jwt.access-token.secret}")
     private lateinit var accessTokenSecret: String
 
@@ -34,7 +32,7 @@ class GenerateJWTProvider : GenerateJWTUseCase {
                 .claim("vendor", payload.vendor)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(DateFormat.parseDurationToDate(accessTokenExpiration))
-                .signWith(convertStringToKey(accessTokenSecret))
+                .signWith(KeyUtil.convertStringToKey(accessTokenSecret))
                 .compact()
         return token
     }
@@ -46,13 +44,8 @@ class GenerateJWTProvider : GenerateJWTUseCase {
                 .claim("vendor", payload.vendor)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(DateFormat.parseDurationToDate(registerTokenExpiration))
-                .signWith(convertStringToKey(registerTokenSecret))
+                .signWith(KeyUtil.convertStringToKey(registerTokenSecret))
                 .compact()
         return token
-    }
-
-    private fun convertStringToKey(secret: String): Key {
-        val keyBytes = Decoders.BASE64.decode(secret)
-        return Keys.hmacShaKeyFor(keyBytes)
     }
 }
