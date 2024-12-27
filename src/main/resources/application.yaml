@@ -1,17 +1,27 @@
 server:
-  port: ${PORT:8080}
+    port: ${PORT:8080}
 spring:
-  application:
-    name: maru-backend
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        show_sql: false
+    application:
+        name: maru-backend
+    datasource:
+        driver-class-name: org.postgresql.Driver
+        url: ${DATABASE_URL}
+        username: ${DATABASE_USERNAME}
+        password: ${DATABASE_PASSWORD}
+    jpa:
+        hibernate:
+            ddl-auto: validate
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+                show_sql: false
+    security:
+        oauth2:
+            client:
+                registration:
+                    google:
+                        client-id: ${GOOGLE_CLIENT_ID}
+                        client-secret: ${GOOGLE_SECRET}
+                        scope:
+                            - profile
+                            - email
