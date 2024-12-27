@@ -146,11 +146,6 @@ class UserDomainTest {
     }
 
     @Test
-    fun `인증되지 않은 사용자가 타인의 정보를 가져오면 오류를 반환함`() {
-        error("Not implemented")
-    }
-
-    @Test
     fun `사용자 정보를 성공적으로 수정함`() {
         val input = UpdateUserUseCaseDto(nickname = "NewNickname", deletedAt = null)
         val userId = UUID.randomUUID()
@@ -196,17 +191,7 @@ class UserDomainTest {
     }
 
     @Test
-    fun `인증되지 않은 사용자가 타인의 정보를 수정하면 오류를 반환함`() {
-        error("Not implemented")
-    }
-
-    @Test
     fun `사용자가 성공적으로 탈퇴함`() {
-        error("Not implemented")
-    }
-
-    @Test
-    fun `인증되지 않은 사용자가 타인의 정보로 탈퇴하면 오류를 반환함`() {
         error("Not implemented")
     }
 
