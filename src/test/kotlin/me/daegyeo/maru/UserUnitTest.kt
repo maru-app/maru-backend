@@ -24,7 +24,7 @@ import java.util.UUID
 
 @Suppress("NonAsciiCharacters")
 @ExtendWith(MockitoExtension::class)
-class UserDomainTest {
+class UserUnitTest {
     private val createUserPort = mock(CreateUserPort::class.java)
     private val readUserPort = mock(ReadUserPort::class.java)
     private val updatedUserPort = mock(UpdateUserPort::class.java)
