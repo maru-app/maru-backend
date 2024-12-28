@@ -2,9 +2,9 @@ package me.daegyeo.maru.auth.application.service
 
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.Keys
 import me.daegyeo.maru.auth.application.error.AuthError
 import me.daegyeo.maru.auth.application.port.`in`.ValidateJWTUseCase
-import me.daegyeo.maru.auth.application.util.KeyUtil
 import me.daegyeo.maru.shared.exception.ServiceException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -19,7 +19,8 @@ class ValidateJWTService : ValidateJWTUseCase {
 
     override fun validateAccessToken(accessToken: String): Boolean {
         try {
-            Jwts.parser().setSigningKey(KeyUtil.convertStringToKey(accessTokenSecret)).build().parseSignedClaims(accessToken)
+            Jwts.parser().verifyWith(Keys.hmacShaKeyFor(accessTokenSecret.toByteArray())).build()
+                .parseSignedClaims(accessToken)
             return true
         } catch (e: JwtException) {
             throw ServiceException(AuthError.PERMISSION_DENIED)
@@ -28,7 +29,8 @@ class ValidateJWTService : ValidateJWTUseCase {
 
     override fun validateRegisterToken(registerToken: String): Boolean {
         try {
-            Jwts.parser().setSigningKey(KeyUtil.convertStringToKey(registerTokenSecret)).build().parseSignedClaims(registerToken)
+            Jwts.parser().verifyWith(Keys.hmacShaKeyFor(registerTokenSecret.toByteArray())).build()
+                .parseSignedClaims(registerToken)
             return true
         } catch (e: JwtException) {
             throw ServiceException(AuthError.PERMISSION_DENIED)

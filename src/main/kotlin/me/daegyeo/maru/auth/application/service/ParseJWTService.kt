@@ -2,11 +2,11 @@ package me.daegyeo.maru.auth.application.service
 
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.Keys
 import me.daegyeo.maru.auth.application.domain.AccessTokenPayload
 import me.daegyeo.maru.auth.application.domain.RegisterTokenPayload
 import me.daegyeo.maru.auth.application.error.AuthError
 import me.daegyeo.maru.auth.application.port.`in`.ParseJWTUseCase
-import me.daegyeo.maru.auth.application.util.KeyUtil
 import me.daegyeo.maru.shared.exception.ServiceException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -22,7 +22,7 @@ class ParseJWTService : ParseJWTUseCase {
     override fun parseAccessToken(accessToken: String): AccessTokenPayload {
         try {
             val payload =
-                Jwts.parser().setSigningKey(KeyUtil.convertStringToKey(accessTokenSecret)).build()
+                Jwts.parser().verifyWith(Keys.hmacShaKeyFor(accessTokenSecret.toByteArray())).build()
                     .parseSignedClaims(accessToken).payload as Map<*, *>
             return AccessTokenPayload(
                 email = payload["sub"] as String,
@@ -36,7 +36,7 @@ class ParseJWTService : ParseJWTUseCase {
     override fun parseRegisterToken(registerToken: String): RegisterTokenPayload {
         try {
             val payload =
-                Jwts.parser().setSigningKey(KeyUtil.convertStringToKey(registerTokenSecret)).build()
+                Jwts.parser().verifyWith(Keys.hmacShaKeyFor(registerTokenSecret.toByteArray())).build()
                     .parseSignedClaims(registerToken).payload as Map<*, *>
             return RegisterTokenPayload(
                 email = payload["sub"] as String,

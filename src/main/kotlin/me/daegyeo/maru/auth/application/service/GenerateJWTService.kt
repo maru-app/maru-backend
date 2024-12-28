@@ -1,10 +1,10 @@
 package me.daegyeo.maru.auth.application.service
 
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.security.Keys
 import me.daegyeo.maru.auth.application.domain.AccessTokenPayload
 import me.daegyeo.maru.auth.application.domain.RegisterTokenPayload
 import me.daegyeo.maru.auth.application.port.`in`.GenerateJWTUseCase
-import me.daegyeo.maru.auth.application.util.KeyUtil
 import me.daegyeo.maru.shared.util.DateFormat
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -32,7 +32,7 @@ class GenerateJWTService : GenerateJWTUseCase {
                 .claim("vendor", payload.vendor)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(DateFormat.parseDurationToDate(accessTokenExpiration))
-                .signWith(KeyUtil.convertStringToKey(accessTokenSecret))
+                .signWith(Keys.hmacShaKeyFor(accessTokenSecret.toByteArray()))
                 .compact()
         return token
     }
@@ -44,7 +44,7 @@ class GenerateJWTService : GenerateJWTUseCase {
                 .claim("vendor", payload.vendor)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(DateFormat.parseDurationToDate(registerTokenExpiration))
-                .signWith(KeyUtil.convertStringToKey(registerTokenSecret))
+                .signWith(Keys.hmacShaKeyFor(registerTokenSecret.toByteArray()))
                 .compact()
         return token
     }
