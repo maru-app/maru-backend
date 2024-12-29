@@ -2,11 +2,17 @@ package me.daegyeo.maru
 
 import io.jsonwebtoken.*
 import me.daegyeo.maru.auth.application.domain.AccessTokenPayload
+import me.daegyeo.maru.auth.application.domain.RegisterTokenPayload
 import me.daegyeo.maru.auth.application.error.AuthError
+import me.daegyeo.maru.auth.application.port.`in`.ParseJWTUseCase
+import me.daegyeo.maru.auth.application.port.`in`.command.RegisterUserCommand
 import me.daegyeo.maru.auth.application.service.GenerateJWTService
 import me.daegyeo.maru.auth.application.service.ParseJWTService
+import me.daegyeo.maru.auth.application.service.RegisterUserService
 import me.daegyeo.maru.auth.application.service.ValidateJWTService
+import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
+import me.daegyeo.maru.user.application.port.`in`.CreateUserUseCase
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -26,6 +32,7 @@ class AuthUnitTest {
     private val jwtParserBuilder = mock(Jwts.parser()::class.java)
     private val jwtParser = mock(JwtParser::class.java)
     private val jws: Jws<Claims> = mock(Jws::class.java) as Jws<Claims>
+    private val createUserUseCase = mock(CreateUserUseCase::class.java)
     private val parseJWTService = ParseJWTService()
     private val validateJWTService = ValidateJWTService()
     private val generateJWTService = GenerateJWTService()
@@ -52,6 +59,10 @@ class AuthUnitTest {
         val accessTokenExpirationField = GenerateJWTService::class.java.getDeclaredField("accessTokenExpiration")
         accessTokenExpirationField.isAccessible = true
         accessTokenExpirationField.set(generateJWTService, "1d")
+
+        val registerTokenSecretField = ParseJWTService::class.java.getDeclaredField("registerTokenSecret")
+        registerTokenSecretField.isAccessible = true
+        registerTokenSecretField.set(parseJWTService, secret)
     }
 
     @Test
@@ -59,7 +70,7 @@ class AuthUnitTest {
         val mockedJwts = mockStatic(Jwts::class.java)
         mockedJwts.`when`<JwtBuilder> { Jwts.builder() }.thenReturn(jwtBuilder)
 
-        val input = AccessTokenPayload(email = "foobar@acme.com", vendor = "google")
+        val input = AccessTokenPayload(email = "foobar@acme.com", vendor = Vendor.GOOGLE)
         `when`(jwtBuilder.subject(input.email)).thenReturn(jwtBuilder)
         `when`(jwtBuilder.claim("vendor", input.vendor)).thenReturn(jwtBuilder)
         `when`(jwtBuilder.issuedAt(any())).thenReturn(jwtBuilder)
@@ -128,6 +139,29 @@ class AuthUnitTest {
         mockedJwts.close()
 
         assert(result.email == "foobar@acme.com")
-        assert(result.vendor == "google")
+        assert(result.vendor == Vendor.GOOGLE)
+    }
+
+    @Test
+    fun `RegisterToken을 사용해서 성공적으로 회원가입함`() {
+        val mockParseJWTUseCase = mock(ParseJWTUseCase::class.java)
+        val registerUserService = RegisterUserService(mockParseJWTUseCase, createUserUseCase)
+
+        val input =
+            RegisterUserCommand(
+                registerToken = "token",
+                nickname = "foobar",
+            )
+        val payload =
+            RegisterTokenPayload(
+                email = "foobar@acme.com",
+                vendor = Vendor.GOOGLE,
+            )
+        `when`(mockParseJWTUseCase.parseRegisterToken(input.registerToken)).thenReturn(payload)
+
+        val result = registerUserService.registerUser(input)
+
+        assert(result)
+        verify(createUserUseCase).createUser(any())
     }
 }
