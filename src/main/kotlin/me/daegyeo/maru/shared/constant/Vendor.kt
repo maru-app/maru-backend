@@ -1,4 +1,4 @@
-package me.daegyeo.maru.user.application.constant
+package me.daegyeo.maru.shared.constant
 
 enum class Vendor {
     NAVER,

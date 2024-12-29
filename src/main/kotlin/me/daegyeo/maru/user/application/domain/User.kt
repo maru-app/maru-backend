@@ -1,6 +1,6 @@
 package me.daegyeo.maru.user.application.domain
 
-import me.daegyeo.maru.user.application.constant.Vendor
+import me.daegyeo.maru.shared.constant.Vendor
 import java.time.ZonedDateTime
 import java.util.UUID
 

@@ -1,7 +1,7 @@
 package me.daegyeo.maru
 
+import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
-import me.daegyeo.maru.user.application.constant.Vendor
 import me.daegyeo.maru.user.application.domain.User
 import me.daegyeo.maru.user.application.error.UserError
 import me.daegyeo.maru.user.application.port.`in`.dto.CreateUserUseCaseDto
