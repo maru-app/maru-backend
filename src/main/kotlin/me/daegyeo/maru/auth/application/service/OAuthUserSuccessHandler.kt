@@ -7,6 +7,7 @@ import me.daegyeo.maru.auth.application.domain.AccessTokenPayload
 import me.daegyeo.maru.auth.application.domain.RegisterTokenPayload
 import me.daegyeo.maru.auth.application.port.`in`.GenerateJWTUseCase
 import me.daegyeo.maru.auth.application.port.`in`.OAuthUserSuccessUseCase
+import me.daegyeo.maru.auth.constant.Auth
 import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
 import me.daegyeo.maru.user.application.error.UserError
@@ -47,7 +48,7 @@ class OAuthUserSuccessHandler(
                     ),
                 )
 
-            response?.addCookie(Cookie("_maruToken", token))
+            response?.addCookie(Cookie(Auth.ACCESS_TOKEN_COOKIE, token))
             response?.sendRedirect("/")
         } catch (e: Exception) {
             if (e is ServiceException && e.error == UserError.USER_NOT_FOUND) {

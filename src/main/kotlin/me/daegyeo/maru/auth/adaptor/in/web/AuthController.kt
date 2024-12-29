@@ -5,6 +5,7 @@ import me.daegyeo.maru.auth.application.port.`in`.GetAuthInfoUseCase
 import me.daegyeo.maru.auth.application.port.`in`.RegisterUserUseCase
 import me.daegyeo.maru.auth.application.port.`in`.command.RegisterUserCommand
 import me.daegyeo.maru.auth.application.port.`in`.result.AuthInfoResult
+import me.daegyeo.maru.auth.constant.Auth
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 
@@ -17,7 +18,7 @@ class AuthController(
 ) {
     @GetMapping("/me")
     fun getMyInfo(
-        @CookieValue("_maruToken") accessToken: String,
+        @CookieValue(Auth.ACCESS_TOKEN_COOKIE) accessToken: String,
     ): AuthInfoResult {
         return getAuthInfoUseCase.getAuthInfo(accessToken)
     }
@@ -25,7 +26,7 @@ class AuthController(
     @PostMapping("/register")
     fun registerUser(
         @RequestBody body: RegisterUserDto,
-        @RequestHeader("X-Maru-RegisterToken") registerToken: String,
+        @RequestHeader(Auth.REGISTER_TOKEN_HEADER) registerToken: String,
     ): Boolean {
         return registerUserUseCase.registerUser(
             RegisterUserCommand(
