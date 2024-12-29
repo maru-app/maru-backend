@@ -4,4 +4,4 @@ import me.daegyeo.maru.shared.error.BaseError
 
 class ServiceException(
     val error: BaseError,
-) : RuntimeException()
+) : RuntimeException(error.toString())
