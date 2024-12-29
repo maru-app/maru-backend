@@ -7,6 +7,7 @@ import me.daegyeo.maru.auth.application.domain.AccessTokenPayload
 import me.daegyeo.maru.auth.application.domain.RegisterTokenPayload
 import me.daegyeo.maru.auth.application.error.AuthError
 import me.daegyeo.maru.auth.application.port.`in`.ParseJWTUseCase
+import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -26,7 +27,7 @@ class ParseJWTService : ParseJWTUseCase {
                     .parseSignedClaims(accessToken).payload as Map<*, *>
             return AccessTokenPayload(
                 email = payload["sub"] as String,
-                vendor = payload["vendor"] as String,
+                vendor = Vendor.valueOf((payload["vendor"] as String).uppercase()),
             )
         } catch (e: JwtException) {
             throw ServiceException(AuthError.PERMISSION_DENIED)
@@ -40,7 +41,7 @@ class ParseJWTService : ParseJWTUseCase {
                     .parseSignedClaims(registerToken).payload as Map<*, *>
             return RegisterTokenPayload(
                 email = payload["sub"] as String,
-                vendor = payload["vendor"] as String,
+                vendor = Vendor.valueOf((payload["vendor"] as String).uppercase()),
             )
         } catch (e: JwtException) {
             throw ServiceException(AuthError.PERMISSION_DENIED)
