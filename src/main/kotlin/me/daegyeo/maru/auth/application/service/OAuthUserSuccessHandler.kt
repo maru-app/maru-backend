@@ -30,38 +30,38 @@ class OAuthUserSuccessHandler(
         response: HttpServletResponse?,
         authentication: Authentication?,
     ) {
-        if (authentication is OAuth2AuthenticationToken) {
-            val vendor = authentication.authorizedClientRegistrationId
+        if (authentication !is OAuth2AuthenticationToken) return
 
-            val oAuth2User = authentication.principal as OAuth2User
-            val userAttributes = oAuth2User.attributes
-            val email = userAttributes["email"] as String
+        val oAuth2User = authentication.principal as OAuth2User
+        val userAttributes = oAuth2User.attributes
+        val email = userAttributes["email"] as String
+        val vendor = authentication.authorizedClientRegistrationId
 
-            try {
-                val existsUser = getUserUseCase.getUserByEmail(email)
-                val token =
-                    generateJWTUseCase.generateAccessToken(
-                        AccessTokenPayload(
-                            email = existsUser.email,
-                            vendor = existsUser.vendor,
+        try {
+            val existsUser = getUserUseCase.getUserByEmail(email)
+            val token =
+                generateJWTUseCase.generateAccessToken(
+                    AccessTokenPayload(
+                        email = existsUser.email,
+                        vendor = existsUser.vendor,
+                    ),
+                )
+
+            response?.addCookie(Cookie("_maruToken", token))
+            response?.sendRedirect("/")
+        } catch (e: Exception) {
+            if (e is ServiceException && e.error == UserError.USER_NOT_FOUND) {
+                val registerToken =
+                    generateJWTUseCase.generateRegisterToken(
+                        RegisterTokenPayload(
+                            email = email,
+                            vendor = Vendor.valueOf(vendor.uppercase()),
                         ),
                     )
 
-                response?.addCookie(Cookie("_maruToken", token))
-            } catch (e: Exception) {
-                if (e is ServiceException && e.error == UserError.USER_NOT_FOUND) {
-                    val registerToken =
-                        generateJWTUseCase.generateRegisterToken(
-                            RegisterTokenPayload(
-                                email = email,
-                                vendor = Vendor.valueOf(vendor.uppercase()),
-                            ),
-                        )
-
-                    response?.sendRedirect("$redirectUrl?token=$registerToken")
-                } else {
-                    throw e
-                }
+                response?.sendRedirect("$redirectUrl?token=$registerToken")
+            } else {
+                throw e
             }
         }
     }
