@@ -11,7 +11,7 @@ import java.util.*
 @Entity
 @Table(name = "users")
 @SQLDelete(sql = "UPDATE users SET deleted_at = now() WHERE user_id = ?")
-@SQLRestriction("deleted_at IS NOT NULL")
+@SQLRestriction("deleted_at IS NULL")
 class UserEntity(
     @Column(nullable = false, unique = true)
     val email: String,
