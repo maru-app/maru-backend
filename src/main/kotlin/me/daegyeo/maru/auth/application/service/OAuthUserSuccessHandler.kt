@@ -48,7 +48,11 @@ class OAuthUserSuccessHandler(
                     ),
                 )
 
-            response?.addCookie(Cookie(Auth.ACCESS_TOKEN_COOKIE, token))
+            val tokenCookie = Cookie(Auth.ACCESS_TOKEN_COOKIE, token)
+            tokenCookie.isHttpOnly = true
+            tokenCookie.secure = true
+            tokenCookie.maxAge = 60 * 60 * 24 * 14
+            response?.addCookie(tokenCookie)
             response?.sendRedirect("/")
         } catch (e: Exception) {
             if (e is ServiceException && e.error == UserError.USER_NOT_FOUND) {
