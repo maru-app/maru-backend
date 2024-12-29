@@ -1,8 +1,8 @@
-package me.daegyeo.maru.user.application.port.`in`.dto
+package me.daegyeo.maru.user.application.port.`in`.command
 
 import java.time.ZonedDateTime
 
-data class UpdateUserUseCaseDto(
+data class UpdateUserUseCaseCommand(
     val nickname: String?,
     val deletedAt: ZonedDateTime?,
 )

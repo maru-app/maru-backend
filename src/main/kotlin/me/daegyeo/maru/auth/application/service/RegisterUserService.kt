@@ -4,7 +4,7 @@ import me.daegyeo.maru.auth.application.port.`in`.ParseJWTUseCase
 import me.daegyeo.maru.auth.application.port.`in`.RegisterUserUseCase
 import me.daegyeo.maru.auth.application.port.`in`.command.RegisterUserCommand
 import me.daegyeo.maru.user.application.port.`in`.CreateUserUseCase
-import me.daegyeo.maru.user.application.port.`in`.dto.CreateUserUseCaseDto
+import me.daegyeo.maru.user.application.port.`in`.command.CreateUserUseCaseCommand
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,7 +18,7 @@ class RegisterUserService(
         val payload = parseJWTUseCase.parseRegisterToken(input.registerToken)
 
         createUserUseCase.createUser(
-            CreateUserUseCaseDto(
+            CreateUserUseCaseCommand(
                 email = payload.email,
                 nickname = input.nickname,
                 vendor = payload.vendor,

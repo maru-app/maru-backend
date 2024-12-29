@@ -4,8 +4,8 @@ import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
 import me.daegyeo.maru.user.application.domain.User
 import me.daegyeo.maru.user.application.error.UserError
-import me.daegyeo.maru.user.application.port.`in`.dto.CreateUserUseCaseDto
-import me.daegyeo.maru.user.application.port.`in`.dto.UpdateUserUseCaseDto
+import me.daegyeo.maru.user.application.port.`in`.command.CreateUserUseCaseCommand
+import me.daegyeo.maru.user.application.port.`in`.command.UpdateUserUseCaseCommand
 import me.daegyeo.maru.user.application.port.out.CreateUserPort
 import me.daegyeo.maru.user.application.port.out.ReadUserPort
 import me.daegyeo.maru.user.application.port.out.UpdateUserPort
@@ -34,7 +34,7 @@ class UserUnitTest {
 
     @Test
     fun `이미 존재하는 이메일로 회원가입 시 오류를 반환함`() {
-        val input = CreateUserUseCaseDto(email = "test@example.com", vendor = Vendor.GOOGLE, nickname = "TestUser")
+        val input = CreateUserUseCaseCommand(email = "test@example.com", vendor = Vendor.GOOGLE, nickname = "TestUser")
         `when`(readUserPort.readUserByEmail(input.email)).thenReturn(
             User(
                 userId = UUID.randomUUID(),
@@ -56,7 +56,7 @@ class UserUnitTest {
 
     @Test
     fun `새로운 사용자가 성공적으로 회원가입함`() {
-        val input = CreateUserUseCaseDto(email = "newuser@example.com", vendor = Vendor.GOOGLE, nickname = "NewUser")
+        val input = CreateUserUseCaseCommand(email = "newuser@example.com", vendor = Vendor.GOOGLE, nickname = "NewUser")
         `when`(readUserPort.readUserByEmail(input.email)).thenReturn(null)
         val createUserDto = CreateUserDto(email = "newuser@example.com", vendor = Vendor.GOOGLE, nickname = "NewUser")
         `when`(createUserPort.createUser(createUserDto)).thenReturn(
@@ -147,7 +147,7 @@ class UserUnitTest {
 
     @Test
     fun `사용자 정보를 성공적으로 수정함`() {
-        val input = UpdateUserUseCaseDto(nickname = "NewNickname", deletedAt = null)
+        val input = UpdateUserUseCaseCommand(nickname = "NewNickname", deletedAt = null)
         val userId = UUID.randomUUID()
         `when`(
             updatedUserPort.updateUser(
@@ -174,7 +174,7 @@ class UserUnitTest {
 
     @Test
     fun `존재하지 않는 사용자 정보를 수정하면 오류를 반환함`() {
-        val input = UpdateUserUseCaseDto(nickname = "NewNickname", deletedAt = null)
+        val input = UpdateUserUseCaseCommand(nickname = "NewNickname", deletedAt = null)
         val userId = UUID.randomUUID()
         `when`(
             updatedUserPort.updateUser(
