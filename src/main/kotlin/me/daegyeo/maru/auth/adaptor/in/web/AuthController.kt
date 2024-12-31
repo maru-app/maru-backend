@@ -1,5 +1,7 @@
 package me.daegyeo.maru.auth.adaptor.`in`.web
 
+import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletResponse
 import me.daegyeo.maru.auth.adaptor.`in`.web.dto.RegisterUserDto
 import me.daegyeo.maru.auth.application.port.`in`.GetAuthInfoUseCase
 import me.daegyeo.maru.auth.application.port.`in`.RegisterUserUseCase
@@ -39,7 +41,14 @@ class AuthController(
 
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/logout")
-    fun logout(): String {
-        return "Hello, World!"
+    fun logout(response: HttpServletResponse): Boolean {
+        response.addCookie(
+            Cookie(Auth.ACCESS_TOKEN_COOKIE, null).apply {
+                maxAge = 0
+                isHttpOnly = true
+            },
+        )
+        // TODO: Add the deleted access token in blacklist database.
+        return true
     }
 }
