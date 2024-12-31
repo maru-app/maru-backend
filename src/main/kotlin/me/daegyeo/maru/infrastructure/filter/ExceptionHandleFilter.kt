@@ -1,4 +1,4 @@
-package me.daegyeo.maru.shared.filter
+package me.daegyeo.maru.infrastructure.filter
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain

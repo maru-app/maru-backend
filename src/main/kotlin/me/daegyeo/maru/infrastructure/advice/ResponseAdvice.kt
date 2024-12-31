@@ -1,4 +1,4 @@
-package me.daegyeo.maru.shared.advice
+package me.daegyeo.maru.infrastructure.advice
 
 import org.springframework.core.MethodParameter
 import org.springframework.http.MediaType

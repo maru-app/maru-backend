@@ -1,7 +1,7 @@
-package me.daegyeo.maru.shared.config
+package me.daegyeo.maru.infrastructure.config
 
 import me.daegyeo.maru.auth.application.port.`in`.OAuthUserSuccessUseCase
-import me.daegyeo.maru.shared.filter.ExceptionHandleFilter
+import me.daegyeo.maru.infrastructure.filter.ExceptionHandleFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity

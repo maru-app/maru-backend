@@ -1,4 +1,4 @@
-package me.daegyeo.maru.shared.advice
+package me.daegyeo.maru.infrastructure.advice
 
 import me.daegyeo.maru.shared.error.CommonError
 import me.daegyeo.maru.shared.error.ErrorResponse
