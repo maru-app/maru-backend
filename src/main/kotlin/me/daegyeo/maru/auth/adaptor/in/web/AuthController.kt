@@ -6,6 +6,7 @@ import me.daegyeo.maru.auth.application.port.`in`.RegisterUserUseCase
 import me.daegyeo.maru.auth.application.port.`in`.command.RegisterUserCommand
 import me.daegyeo.maru.auth.application.port.`in`.result.AuthInfoResult
 import me.daegyeo.maru.auth.constant.Auth
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -14,6 +15,7 @@ class AuthController(
     private val registerUserUseCase: RegisterUserUseCase,
     private val getAuthInfoUseCase: GetAuthInfoUseCase,
 ) {
+    @PreAuthorize("hasRole('USER'))")
     @GetMapping("/me")
     fun getMyInfo(
         @CookieValue(Auth.ACCESS_TOKEN_COOKIE) accessToken: String,
@@ -21,6 +23,7 @@ class AuthController(
         return getAuthInfoUseCase.getAuthInfo(accessToken)
     }
 
+    @PreAuthorize("permitAll()")
     @PostMapping("/register")
     fun registerUser(
         @RequestBody body: RegisterUserDto,
@@ -34,6 +37,7 @@ class AuthController(
         )
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/logout")
     fun logout(): String {
         return "Hello, World!"
