@@ -5,6 +5,7 @@ import me.daegyeo.maru.shared.error.ErrorResponse
 import me.daegyeo.maru.shared.exception.ServiceException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingRequestCookieException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -25,7 +26,7 @@ class ExceptionHandleAdvice {
         )
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException::class)
+    @ExceptionHandler(MethodArgumentNotValidException::class, HttpRequestMethodNotSupportedException::class)
     fun handleMethodArgumentNotValidException(): ResponseEntity<ErrorResponse> {
         return ResponseEntity(
             ErrorResponse(CommonError.INVALID_REQUEST.code),
