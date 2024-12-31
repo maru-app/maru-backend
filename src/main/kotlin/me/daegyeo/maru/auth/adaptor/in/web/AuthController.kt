@@ -15,7 +15,7 @@ class AuthController(
     private val registerUserUseCase: RegisterUserUseCase,
     private val getAuthInfoUseCase: GetAuthInfoUseCase,
 ) {
-    @PreAuthorize("hasRole('USER'))")
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/me")
     fun getMyInfo(
         @CookieValue(Auth.ACCESS_TOKEN_COOKIE) accessToken: String,
