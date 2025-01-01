@@ -9,7 +9,6 @@ class DiaryMapper {
     fun toDomain(diaryEntity: DiaryEntity): Diary {
         return Diary(
             diaryId = diaryEntity.diaryId!!,
-            userId = diaryEntity.userId,
             content = diaryEntity.content,
             createdAt = diaryEntity.createdAt!!,
             updatedAt = diaryEntity.updatedAt!!,
