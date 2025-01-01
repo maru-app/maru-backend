@@ -8,10 +8,10 @@ import java.util.UUID
 @Entity
 @Table(name = "diaries")
 class DiaryEntity(
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     var content: String,
 
-    @ManyToOne
+    @ManyToOne(targetEntity = UserEntity::class)
     @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
     val user: UserEntity? = null,
 
