@@ -34,3 +34,5 @@ jwt:
     register-token:
         secret: ${REGISTER_TOKEN_SECRET}
         expiration: ${REGISTER_TOKEN_EXPIRATION}
+diary:
+    secret: ${DIARY_SECRET}
