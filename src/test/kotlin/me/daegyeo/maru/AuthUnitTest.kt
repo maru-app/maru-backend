@@ -6,13 +6,12 @@ import me.daegyeo.maru.auth.application.domain.RegisterTokenPayload
 import me.daegyeo.maru.auth.application.error.AuthError
 import me.daegyeo.maru.auth.application.port.`in`.ParseJWTUseCase
 import me.daegyeo.maru.auth.application.port.`in`.command.RegisterUserCommand
-import me.daegyeo.maru.auth.application.service.GenerateJWTService
-import me.daegyeo.maru.auth.application.service.ParseJWTService
-import me.daegyeo.maru.auth.application.service.RegisterUserService
-import me.daegyeo.maru.auth.application.service.ValidateJWTService
+import me.daegyeo.maru.auth.application.service.*
 import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
+import me.daegyeo.maru.user.application.domain.User
 import me.daegyeo.maru.user.application.port.`in`.CreateUserUseCase
+import me.daegyeo.maru.user.application.port.`in`.GetUserUseCase
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,7 +21,9 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import java.security.SecureRandom
+import java.time.ZonedDateTime
 import java.util.Base64
+import java.util.UUID
 import javax.crypto.SecretKey
 
 @Suppress("NonAsciiCharacters")
@@ -36,6 +37,9 @@ class AuthUnitTest {
     private val parseJWTService = ParseJWTService()
     private val validateJWTService = ValidateJWTService()
     private val generateJWTService = GenerateJWTService()
+    private val getUserUseCase = mock(GetUserUseCase::class.java)
+    private val parseJWTUseCase = mock(ParseJWTUseCase::class.java)
+    private val getAuthInfoService = GetAuthInfoService(getUserUseCase, parseJWTUseCase)
 
     @BeforeEach
     fun setup() {
@@ -163,5 +167,47 @@ class AuthUnitTest {
 
         assert(result)
         verify(createUserUseCase).createUser(any())
+    }
+
+    @Test
+    fun `AccessToken을 사용해서 성공적으로 내 정보를 가져옴`() {
+        val accessToken = "token"
+        val email = "foobar@acme.com"
+        val nickname = "foobar"
+        val vendor = Vendor.GOOGLE
+        val createdAt = ZonedDateTime.now()
+
+        val user =
+            User(
+                userId = UUID.randomUUID(),
+                email = email,
+                vendor = vendor,
+                nickname = nickname,
+                createdAt = createdAt,
+                updatedAt = createdAt,
+                deletedAt = null,
+            )
+        val payload = AccessTokenPayload(email = email, vendor = vendor)
+
+        `when`(parseJWTUseCase.parseAccessToken(accessToken)).thenReturn(payload)
+        `when`(getUserUseCase.getUserByEmail(email)).thenReturn(user)
+
+        val result = getAuthInfoService.getAuthInfo(accessToken)
+
+        assert(email == result.email)
+        assert(nickname == result.nickname)
+        assert(vendor == result.vendor)
+        assert(createdAt == result.createdAt)
+    }
+
+    @Test
+    fun `올바르지 않거나 만료된 AccessToken으로 내 정보를 가져오면 오류를 반환함`() {
+        val accessToken = "invalid.token"
+
+        `when`(parseJWTUseCase.parseAccessToken(accessToken)).thenThrow(ServiceException::class.java)
+
+        assertThrows(ServiceException::class.java) {
+            getAuthInfoService.getAuthInfo(accessToken)
+        }
     }
 }
