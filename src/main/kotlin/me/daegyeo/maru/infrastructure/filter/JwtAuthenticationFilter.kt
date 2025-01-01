@@ -19,6 +19,11 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
+        if (request.cookies.isNullOrEmpty()) {
+            filterChain.doFilter(request, response)
+            return
+        }
+
         val tokenCookie = request.cookies.find { it.name == Auth.ACCESS_TOKEN_COOKIE }
         if (tokenCookie != null) {
             val payload = parseJWTUseCase.parseAccessToken(tokenCookie.value)
