@@ -1,15 +1,9 @@
 package me.daegyeo.maru.diary.application.persistence
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import me.daegyeo.maru.shared.entity.AuditDateTimeEntity
 import me.daegyeo.maru.user.application.persistence.UserEntity
+import java.util.UUID
 
 @Entity
 @Table(name = "diaries")
@@ -18,8 +12,11 @@ class DiaryEntity(
     val content: String,
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    val user: UserEntity,
+    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
+    val user: UserEntity? = null,
+
+    @Column(name = "user_id", nullable = false)
+    val userId: UUID,
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
