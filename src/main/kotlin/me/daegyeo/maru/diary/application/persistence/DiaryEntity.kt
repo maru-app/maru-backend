@@ -9,7 +9,7 @@ import java.util.UUID
 @Table(name = "diaries")
 class DiaryEntity(
     @Column(nullable = false)
-    val content: String,
+    var content: String,
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
