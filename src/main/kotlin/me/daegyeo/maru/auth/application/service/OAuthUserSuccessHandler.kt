@@ -53,6 +53,7 @@ class OAuthUserSuccessHandler(
 
             val tokenCookie =
                 Cookie(Auth.ACCESS_TOKEN_COOKIE, token).apply {
+                    path = "/"
                     isHttpOnly = true
                     secure = true
                     maxAge = (60 * 60 * 24 * 7)
