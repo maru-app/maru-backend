@@ -27,6 +27,7 @@ spring:
                             - email
 oauth:
     redirect-url: ${OAUTH_REDIRECT_URL}
+    success-url: ${OAUTH_SUCCESS_URL}
 jwt:
     access-token:
         secret: ${ACCESS_TOKEN_SECRET}

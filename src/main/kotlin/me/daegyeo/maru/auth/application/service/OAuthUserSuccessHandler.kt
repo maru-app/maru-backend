@@ -26,6 +26,9 @@ class OAuthUserSuccessHandler(
     @Value("\${oauth.redirect-url}")
     private lateinit var redirectUrl: String
 
+    @Value("\${oauth.success-url}")
+    private lateinit var successUrl: String
+
     override fun onAuthenticationSuccess(
         request: HttpServletRequest?,
         response: HttpServletResponse?,
@@ -48,12 +51,14 @@ class OAuthUserSuccessHandler(
                     ),
                 )
 
-            val tokenCookie = Cookie(Auth.ACCESS_TOKEN_COOKIE, token)
-            tokenCookie.isHttpOnly = true
-            tokenCookie.secure = true
-            tokenCookie.maxAge = 60 * 60 * 24 * 14
+            val tokenCookie =
+                Cookie(Auth.ACCESS_TOKEN_COOKIE, token).apply {
+                    isHttpOnly = true
+                    secure = true
+                    maxAge = (60 * 60 * 24 * 7)
+                }
             response?.addCookie(tokenCookie)
-            response?.sendRedirect("/")
+            response?.sendRedirect(successUrl)
         } catch (e: Exception) {
             if (e is ServiceException && e.error == UserError.USER_NOT_FOUND) {
                 val registerToken =
