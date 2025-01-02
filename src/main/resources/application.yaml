@@ -37,3 +37,5 @@ jwt:
         expiration: ${REGISTER_TOKEN_EXPIRATION}
 diary:
     secret: ${DIARY_SECRET}
+cors:
+    origins: ${CORS_ORIGINS}
