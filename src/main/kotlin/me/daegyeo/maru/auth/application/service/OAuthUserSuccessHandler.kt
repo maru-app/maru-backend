@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import me.daegyeo.maru.auth.application.domain.AccessTokenPayload
 import me.daegyeo.maru.auth.application.domain.RegisterTokenPayload
+import me.daegyeo.maru.auth.application.error.AuthError
 import me.daegyeo.maru.auth.application.port.`in`.GenerateJWTUseCase
 import me.daegyeo.maru.auth.application.port.`in`.OAuthUserSuccessUseCase
 import me.daegyeo.maru.auth.constant.Auth
@@ -37,9 +38,14 @@ class OAuthUserSuccessHandler(
         if (authentication !is OAuth2AuthenticationToken) return
 
         val oAuth2User = authentication.principal as OAuth2User
-        val userAttributes = oAuth2User.attributes
-        val email = userAttributes["email"] as String
         val vendor = authentication.authorizedClientRegistrationId
+        val userAttributes = oAuth2User.attributes
+        val email =
+            when (vendor) {
+                Vendor.GOOGLE.name.lowercase() -> userAttributes["email"] as String
+                Vendor.NAVER.name.lowercase() -> (userAttributes["response"] as Map<String, String>)["email"] as String
+                else -> throw ServiceException(AuthError.PERMISSION_DENIED)
+            }
 
         try {
             val existsUser = getUserUseCase.getUserByEmail(email)
