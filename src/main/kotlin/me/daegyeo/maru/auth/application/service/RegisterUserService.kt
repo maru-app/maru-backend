@@ -3,6 +3,7 @@ package me.daegyeo.maru.auth.application.service
 import me.daegyeo.maru.auth.application.port.`in`.ParseJWTUseCase
 import me.daegyeo.maru.auth.application.port.`in`.RegisterUserUseCase
 import me.daegyeo.maru.auth.application.port.`in`.command.RegisterUserCommand
+import me.daegyeo.maru.auth.application.port.`in`.result.RegisterUserResult
 import me.daegyeo.maru.user.application.port.`in`.CreateUserUseCase
 import me.daegyeo.maru.user.application.port.`in`.command.CreateUserUseCaseCommand
 import org.springframework.stereotype.Service
@@ -14,7 +15,7 @@ class RegisterUserService(
     private val createUserUseCase: CreateUserUseCase,
 ) : RegisterUserUseCase {
     @Transactional
-    override fun registerUser(input: RegisterUserCommand): Boolean {
+    override fun registerUser(input: RegisterUserCommand): RegisterUserResult {
         val payload = parseJWTUseCase.parseRegisterToken(input.registerToken)
 
         createUserUseCase.createUser(
@@ -25,6 +26,9 @@ class RegisterUserService(
             ),
         )
 
-        return true
+        return RegisterUserResult(
+            email = payload.email,
+            vendor = payload.vendor,
+        )
     }
 }
