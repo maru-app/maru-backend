@@ -4,5 +4,6 @@ import java.util.UUID
 
 data class CreateDiaryDto(
     val userId: UUID,
+    val title: String,
     val content: String,
 )

@@ -9,6 +9,9 @@ import java.util.UUID
 @Table(name = "diaries")
 class DiaryEntity(
     @Column(columnDefinition = "TEXT", nullable = false)
+    var title: String,
+
+    @Column(columnDefinition = "TEXT", nullable = false)
     var content: String,
 
     @ManyToOne(targetEntity = UserEntity::class)

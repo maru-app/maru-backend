@@ -13,10 +13,12 @@ class UpdateDiaryPersistenceAdapter(
 ) : UpdateDiaryPort {
     override fun updateDiary(
         diaryId: Long,
+        title: String,
         content: String,
     ): Diary? {
         val diary = diaryRepository.findById(diaryId).getOrNull()
         return diary?.let {
+            it.title = title
             it.content = content
             diaryMapper.toDomain(diaryRepository.save(it))
         }

@@ -25,6 +25,7 @@ class DiaryController(
     ): Diary {
         return createDiaryUseCase.createDiary(
             CreateDiaryCommand(
+                title = body.title,
                 content = body.content,
                 userId = auth.userId,
             ),

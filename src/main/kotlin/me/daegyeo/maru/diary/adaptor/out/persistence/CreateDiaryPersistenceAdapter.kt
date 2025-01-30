@@ -16,6 +16,7 @@ class CreateDiaryPersistenceAdapter(
         val diary =
             DiaryEntity(
                 userId = input.userId,
+                title = input.title,
                 content = input.content,
             )
 

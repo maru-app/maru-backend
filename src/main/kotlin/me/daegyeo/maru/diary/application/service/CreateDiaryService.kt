@@ -25,6 +25,7 @@ class CreateDiaryService(
             createDiaryPort.createDiary(
                 CreateDiaryDto(
                     userId = user.userId,
+                    title = input.title,
                     content = encryptedContent,
                 ),
             )
