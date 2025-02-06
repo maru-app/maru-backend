@@ -4,7 +4,9 @@ import me.daegyeo.maru.diary.application.domain.Diary
 import me.daegyeo.maru.diary.application.port.`in`.EncryptDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
 import me.daegyeo.maru.diary.application.port.out.CreateDiaryPort
+import me.daegyeo.maru.diary.application.port.out.ReadAllDiaryPort
 import me.daegyeo.maru.diary.application.service.CreateDiaryService
+import me.daegyeo.maru.diary.application.service.GetAllDiaryService
 import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.user.application.domain.User
 import me.daegyeo.maru.user.application.port.`in`.GetUserUseCase
@@ -21,8 +23,10 @@ import java.util.UUID
 class DiaryUnitTest {
     private val getUserUseCase = mock(GetUserUseCase::class.java)
     private val createDiaryPort = mock(CreateDiaryPort::class.java)
+    private val readAllDiaryPort = mock(ReadAllDiaryPort::class.java)
     private val encryptDiaryUseCase = mock(EncryptDiaryUseCase::class.java)
     private val createDiaryService = CreateDiaryService(getUserUseCase, createDiaryPort, encryptDiaryUseCase)
+    private val getAllDiaryService = GetAllDiaryService(readAllDiaryPort)
 
     @Test
     fun `일기를 성공적으로 가져옴`() {
@@ -33,7 +37,33 @@ class DiaryUnitTest {
     }
 
     @Test
-    fun `모든 일기를 성공적으로 가져옴`() {
+    fun `일기 내용이 공백인 상태로 모든 일기를 성공적으로 가져옴`() {
+        val userId = UUID.randomUUID()
+
+        `when`(readAllDiaryPort.readAllDiaryByUserId(userId)).thenReturn(
+            listOf(
+                Diary(
+                    diaryId = 1,
+                    title = "FOO",
+                    content = "",
+                    createdAt = ZonedDateTime.now(),
+                    updatedAt = ZonedDateTime.now(),
+                ),
+                Diary(
+                    diaryId = 2,
+                    title = "BAR",
+                    content = "",
+                    createdAt = ZonedDateTime.now(),
+                    updatedAt = ZonedDateTime.now(),
+                ),
+            ),
+        )
+
+        val result = getAllDiaryService.getAllDiaryByUserId(userId)
+
+        verify(readAllDiaryPort).readAllDiaryByUserId(userId)
+        assert(result.map { it.content }.all { it.isEmpty() })
+        assert(result.size == 2)
     }
 
     @Test
