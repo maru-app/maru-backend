@@ -55,7 +55,6 @@ class DiaryUnitTest {
         val diary =
             Diary(
                 diaryId = 1,
-                userId = userId,
                 title = title,
                 content = encryptedContent,
                 createdAt = ZonedDateTime.now(),
@@ -71,8 +70,6 @@ class DiaryUnitTest {
         verify(getUserUseCase).getUser(userId)
         verify(encryptDiaryUseCase).encryptDiary(content)
         verify(createDiaryPort).createDiary(any())
-
-        assert(result.userId == userId)
         assert(result.title == title)
     }
 

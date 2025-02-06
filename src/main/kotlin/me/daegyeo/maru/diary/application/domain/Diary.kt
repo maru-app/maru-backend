@@ -1,13 +1,12 @@
 package me.daegyeo.maru.diary.application.domain
 
 import java.time.ZonedDateTime
-import java.util.UUID
 
+// userId is not included in the Diary domain. userId not open to the public.
 data class Diary(
     val diaryId: Long,
     var title: String,
     var content: String,
-    val userId: UUID,
     val createdAt: ZonedDateTime,
     val updatedAt: ZonedDateTime,
 )
