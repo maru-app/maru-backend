@@ -30,10 +30,12 @@ class DiaryUnitTest {
 
     @Test
     fun `일기를 성공적으로 가져옴`() {
+        throw NotImplementedError()
     }
 
     @Test
     fun `본인 일기가 아니라면 가져올 때 오류를 반환함`() {
+        throw NotImplementedError()
     }
 
     @Test
@@ -105,17 +107,21 @@ class DiaryUnitTest {
 
     @Test
     fun `일기를 성공적으로 수정함`() {
+        throw NotImplementedError()
     }
 
     @Test
     fun `본인 일기가 아니라면 수정 시 오류를 반환함`() {
+        throw NotImplementedError()
     }
 
     @Test
     fun `일기를 성공적으로 삭제함`() {
+        throw NotImplementedError()
     }
 
     @Test
     fun `본인 일기가 아니라면 삭제 시 오류를 반환함`() {
+        throw NotImplementedError()
     }
 }
