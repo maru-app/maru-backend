@@ -11,6 +11,7 @@ class DiaryMapper {
             diaryId = diaryEntity.diaryId!!,
             title = diaryEntity.title,
             content = diaryEntity.content,
+            userId = diaryEntity.userId,
             createdAt = diaryEntity.createdAt!!,
             updatedAt = diaryEntity.updatedAt!!,
         )
