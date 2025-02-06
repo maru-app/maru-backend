@@ -165,7 +165,8 @@ class AuthUnitTest {
 
         val result = registerUserService.registerUser(input)
 
-        assert(result)
+        assert(result.email == payload.email)
+        assert(result.vendor == payload.vendor)
         verify(createUserUseCase).createUser(any())
     }
 
