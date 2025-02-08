@@ -4,10 +4,7 @@ import me.daegyeo.maru.auth.application.domain.CustomUserDetails
 import me.daegyeo.maru.diary.adaptor.`in`.web.dto.CreateDiaryDto
 import me.daegyeo.maru.diary.adaptor.`in`.web.dto.UpdateDiaryDto
 import me.daegyeo.maru.diary.application.domain.Diary
-import me.daegyeo.maru.diary.application.port.`in`.CreateDiaryUseCase
-import me.daegyeo.maru.diary.application.port.`in`.GetAllDiaryUseCase
-import me.daegyeo.maru.diary.application.port.`in`.GetDiaryUseCase
-import me.daegyeo.maru.diary.application.port.`in`.UpdateDiaryUseCase
+import me.daegyeo.maru.diary.application.port.`in`.*
 import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
 import me.daegyeo.maru.diary.application.port.`in`.command.UpdateDiaryCommand
 import org.springframework.security.access.prepost.PreAuthorize
@@ -21,6 +18,7 @@ class DiaryController(
     private val getAllDiaryUseCase: GetAllDiaryUseCase,
     private val getDiaryUseCase: GetDiaryUseCase,
     private val updateDiaryUseCase: UpdateDiaryUseCase,
+    private val deleteDiaryUseCase: DeleteDiaryUseCase,
 ) {
     @PreAuthorize("hasRole('USER')")
     @PostMapping
@@ -70,5 +68,14 @@ class DiaryController(
                     content = body.content,
                 ),
         )
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @DeleteMapping("/{diaryId}")
+    fun deleteDiary(
+        @PathVariable diaryId: Long,
+        @AuthenticationPrincipal auth: CustomUserDetails,
+    ): Boolean {
+        return deleteDiaryUseCase.deleteDiary(diaryId, auth.userId)
     }
 }
