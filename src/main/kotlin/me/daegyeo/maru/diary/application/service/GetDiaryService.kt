@@ -2,6 +2,7 @@ package me.daegyeo.maru.diary.application.service
 
 import me.daegyeo.maru.diary.application.domain.Diary
 import me.daegyeo.maru.diary.application.error.DiaryError
+import me.daegyeo.maru.diary.application.port.`in`.DecryptDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.GetDiaryUseCase
 import me.daegyeo.maru.diary.application.port.out.ReadDiaryPort
 import me.daegyeo.maru.shared.exception.ServiceException
@@ -10,7 +11,8 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
-class GetDiaryService(private val readDiaryPort: ReadDiaryPort) : GetDiaryUseCase {
+class GetDiaryService(private val readDiaryPort: ReadDiaryPort, private val decryptDiaryUseCase: DecryptDiaryUseCase) :
+    GetDiaryUseCase {
     @Transactional(readOnly = true)
     override fun getDiaryByDiaryId(
         diaryId: Long,
@@ -20,10 +22,11 @@ class GetDiaryService(private val readDiaryPort: ReadDiaryPort) : GetDiaryUseCas
         if (result.userId != currentUserId) {
             throw ServiceException(DiaryError.DIARY_IS_NOT_OWNED)
         }
+        val decryptedContent = decryptDiaryUseCase.decryptDiary(result.content)
         return Diary(
             diaryId = result.diaryId,
             title = result.title,
-            content = result.content,
+            content = decryptedContent,
             createdAt = result.createdAt,
             updatedAt = result.updatedAt,
         )
