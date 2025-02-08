@@ -5,9 +5,11 @@ import me.daegyeo.maru.diary.application.error.DiaryError
 import me.daegyeo.maru.diary.application.port.`in`.GetDiaryUseCase
 import me.daegyeo.maru.diary.application.port.out.ReadDiaryPort
 import me.daegyeo.maru.shared.exception.ServiceException
+import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
+@Service
 class GetDiaryService(private val readDiaryPort: ReadDiaryPort) : GetDiaryUseCase {
     @Transactional(readOnly = true)
     override fun getDiaryByDiaryId(
