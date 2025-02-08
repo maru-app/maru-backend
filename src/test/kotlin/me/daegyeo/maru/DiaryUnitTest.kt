@@ -1,15 +1,21 @@
 package me.daegyeo.maru
 
 import me.daegyeo.maru.diary.application.domain.Diary
+import me.daegyeo.maru.diary.application.domain.DiaryWithUserId
+import me.daegyeo.maru.diary.application.error.DiaryError
 import me.daegyeo.maru.diary.application.port.`in`.EncryptDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
 import me.daegyeo.maru.diary.application.port.out.CreateDiaryPort
 import me.daegyeo.maru.diary.application.port.out.ReadAllDiaryPort
+import me.daegyeo.maru.diary.application.port.out.ReadDiaryPort
 import me.daegyeo.maru.diary.application.service.CreateDiaryService
 import me.daegyeo.maru.diary.application.service.GetAllDiaryService
+import me.daegyeo.maru.diary.application.service.GetDiaryService
 import me.daegyeo.maru.shared.constant.Vendor
+import me.daegyeo.maru.shared.exception.ServiceException
 import me.daegyeo.maru.user.application.domain.User
 import me.daegyeo.maru.user.application.port.`in`.GetUserUseCase
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.*
@@ -24,18 +30,55 @@ class DiaryUnitTest {
     private val getUserUseCase = mock(GetUserUseCase::class.java)
     private val createDiaryPort = mock(CreateDiaryPort::class.java)
     private val readAllDiaryPort = mock(ReadAllDiaryPort::class.java)
+    private val readDiaryPort = mock(ReadDiaryPort::class.java)
     private val encryptDiaryUseCase = mock(EncryptDiaryUseCase::class.java)
     private val createDiaryService = CreateDiaryService(getUserUseCase, createDiaryPort, encryptDiaryUseCase)
     private val getAllDiaryService = GetAllDiaryService(readAllDiaryPort)
+    private val getDiaryService = GetDiaryService(readDiaryPort)
 
     @Test
     fun `일기를 성공적으로 가져옴`() {
-        throw NotImplementedError()
+        val diaryId = 1L
+        val userId = UUID.randomUUID()
+        val diary =
+            DiaryWithUserId(
+                diaryId = diaryId,
+                title = "FOO",
+                userId = userId,
+                content = "ENCRYPTED_CONTENT",
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+            )
+
+        `when`(readDiaryPort.readDiary(diaryId)).thenReturn(diary)
+
+        val result = getDiaryService.getDiaryByDiaryId(diaryId, userId)
+
+        verify(readDiaryPort).readDiary(diaryId)
+        assert(result.diaryId == diaryId)
     }
 
     @Test
     fun `본인 일기가 아니라면 가져올 때 오류를 반환함`() {
-        throw NotImplementedError()
+        val diaryId = 1L
+        val userId = UUID.randomUUID()
+        val diary =
+            DiaryWithUserId(
+                diaryId = diaryId,
+                title = "FOO",
+                userId = UUID.randomUUID(),
+                content = "ENCRYPTED_CONTENT",
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+            )
+
+        `when`(readDiaryPort.readDiary(diaryId)).thenReturn(diary)
+
+        val exception =
+            assertThrows(ServiceException::class.java) {
+                getDiaryService.getDiaryByDiaryId(diaryId, userId)
+            }
+        assert(exception.error == DiaryError.DIARY_IS_NOT_OWNED)
     }
 
     @Test
