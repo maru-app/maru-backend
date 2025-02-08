@@ -8,14 +8,8 @@ import me.daegyeo.maru.diary.application.port.`in`.EncryptDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.GetDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
 import me.daegyeo.maru.diary.application.port.`in`.command.UpdateDiaryCommand
-import me.daegyeo.maru.diary.application.port.out.CreateDiaryPort
-import me.daegyeo.maru.diary.application.port.out.ReadAllDiaryPort
-import me.daegyeo.maru.diary.application.port.out.ReadDiaryPort
-import me.daegyeo.maru.diary.application.port.out.UpdateDiaryPort
-import me.daegyeo.maru.diary.application.service.CreateDiaryService
-import me.daegyeo.maru.diary.application.service.GetAllDiaryService
-import me.daegyeo.maru.diary.application.service.GetDiaryService
-import me.daegyeo.maru.diary.application.service.UpdateDiaryService
+import me.daegyeo.maru.diary.application.port.out.*
+import me.daegyeo.maru.diary.application.service.*
 import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
 import me.daegyeo.maru.user.application.domain.User
@@ -37,6 +31,7 @@ class DiaryUnitTest {
     private val readAllDiaryPort = mock(ReadAllDiaryPort::class.java)
     private val readDiaryPort = mock(ReadDiaryPort::class.java)
     private val updateDiaryPort = mock(UpdateDiaryPort::class.java)
+    private val deleteDiaryPort = mock(DeleteDiaryPort::class.java)
     private val encryptDiaryUseCase = mock(EncryptDiaryUseCase::class.java)
     private val decryptDiaryUseCase = mock(DecryptDiaryUseCase::class.java)
     private val getDiaryUseCase = mock(GetDiaryUseCase::class.java)
@@ -44,6 +39,7 @@ class DiaryUnitTest {
     private val getAllDiaryService = GetAllDiaryService(readAllDiaryPort)
     private val getDiaryService = GetDiaryService(readDiaryPort, decryptDiaryUseCase)
     private val updateDiaryService = UpdateDiaryService(updateDiaryPort, getDiaryUseCase, encryptDiaryUseCase)
+    private val deleteDiaryService = DeleteDiaryService(deleteDiaryPort, getDiaryUseCase)
 
     @Test
     fun `일기를 성공적으로 가져옴`() {
@@ -60,6 +56,7 @@ class DiaryUnitTest {
             )
 
         `when`(readDiaryPort.readDiary(diaryId)).thenReturn(diary)
+        `when`(decryptDiaryUseCase.decryptDiary(diary.content)).thenReturn("DECRYPTED_CONTENT")
 
         val result = getDiaryService.getDiaryByDiaryId(diaryId, userId)
 
@@ -191,7 +188,12 @@ class DiaryUnitTest {
         val title = "FOO BAR"
         val updateContent = "<p>Hello, World</p>"
 
-        `when`(getDiaryUseCase.getDiaryByDiaryId(diaryId, userId)).thenThrow(ServiceException(DiaryError.DIARY_IS_NOT_OWNED))
+        `when`(
+            getDiaryUseCase.getDiaryByDiaryId(
+                diaryId,
+                userId,
+            ),
+        ).thenThrow(ServiceException(DiaryError.DIARY_IS_NOT_OWNED))
 
         val exception =
             assertThrows(ServiceException::class.java) {
@@ -202,11 +204,43 @@ class DiaryUnitTest {
 
     @Test
     fun `일기를 성공적으로 삭제함`() {
-        throw NotImplementedError()
+        val userId = UUID.randomUUID()
+        val diaryId = 1L
+        val diary =
+            Diary(
+                diaryId = diaryId,
+                title = "FOO",
+                content = "ENCRYPTED_CONTENT",
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+            )
+
+        `when`(getDiaryUseCase.getDiaryByDiaryId(diaryId, userId)).thenReturn(diary)
+        `when`(deleteDiaryPort.deleteDiary(diaryId)).thenReturn(true)
+
+        val result = deleteDiaryService.deleteDiary(diaryId, userId)
+
+        verify(getDiaryUseCase).getDiaryByDiaryId(diaryId, userId)
+        verify(deleteDiaryPort).deleteDiary(diaryId)
+        assert(result)
     }
 
     @Test
     fun `본인 일기가 아니라면 삭제 시 오류를 반환함`() {
-        throw NotImplementedError()
+        val userId = UUID.randomUUID()
+        val diaryId = 1L
+
+        `when`(
+            getDiaryUseCase.getDiaryByDiaryId(
+                diaryId,
+                userId,
+            ),
+        ).thenThrow(ServiceException(DiaryError.DIARY_IS_NOT_OWNED))
+
+        val exception =
+            assertThrows(ServiceException::class.java) {
+                deleteDiaryService.deleteDiary(diaryId, userId)
+            }
+        assert(exception.error == DiaryError.DIARY_IS_NOT_OWNED)
     }
 }
