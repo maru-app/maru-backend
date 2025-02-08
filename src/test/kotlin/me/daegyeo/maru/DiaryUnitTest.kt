@@ -3,14 +3,19 @@ package me.daegyeo.maru
 import me.daegyeo.maru.diary.application.domain.Diary
 import me.daegyeo.maru.diary.application.domain.DiaryWithUserId
 import me.daegyeo.maru.diary.application.error.DiaryError
+import me.daegyeo.maru.diary.application.port.`in`.DecryptDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.EncryptDiaryUseCase
+import me.daegyeo.maru.diary.application.port.`in`.GetDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
+import me.daegyeo.maru.diary.application.port.`in`.command.UpdateDiaryCommand
 import me.daegyeo.maru.diary.application.port.out.CreateDiaryPort
 import me.daegyeo.maru.diary.application.port.out.ReadAllDiaryPort
 import me.daegyeo.maru.diary.application.port.out.ReadDiaryPort
+import me.daegyeo.maru.diary.application.port.out.UpdateDiaryPort
 import me.daegyeo.maru.diary.application.service.CreateDiaryService
 import me.daegyeo.maru.diary.application.service.GetAllDiaryService
 import me.daegyeo.maru.diary.application.service.GetDiaryService
+import me.daegyeo.maru.diary.application.service.UpdateDiaryService
 import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
 import me.daegyeo.maru.user.application.domain.User
@@ -31,10 +36,14 @@ class DiaryUnitTest {
     private val createDiaryPort = mock(CreateDiaryPort::class.java)
     private val readAllDiaryPort = mock(ReadAllDiaryPort::class.java)
     private val readDiaryPort = mock(ReadDiaryPort::class.java)
+    private val updateDiaryPort = mock(UpdateDiaryPort::class.java)
     private val encryptDiaryUseCase = mock(EncryptDiaryUseCase::class.java)
+    private val decryptDiaryUseCase = mock(DecryptDiaryUseCase::class.java)
+    private val getDiaryUseCase = mock(GetDiaryUseCase::class.java)
     private val createDiaryService = CreateDiaryService(getUserUseCase, createDiaryPort, encryptDiaryUseCase)
     private val getAllDiaryService = GetAllDiaryService(readAllDiaryPort)
-    private val getDiaryService = GetDiaryService(readDiaryPort)
+    private val getDiaryService = GetDiaryService(readDiaryPort, decryptDiaryUseCase)
+    private val updateDiaryService = UpdateDiaryService(updateDiaryPort, getDiaryUseCase, encryptDiaryUseCase)
 
     @Test
     fun `일기를 성공적으로 가져옴`() {
@@ -150,12 +159,45 @@ class DiaryUnitTest {
 
     @Test
     fun `일기를 성공적으로 수정함`() {
-        throw NotImplementedError()
+        val userId = UUID.randomUUID()
+        val diaryId = 1L
+        val title = "FOO BAR"
+        val updateContent = "<p>Hello, World</p>"
+        val encryptedContent = "ENCRYPTED_CONTENT"
+        val diary =
+            Diary(
+                diaryId = diaryId,
+                title = "PREV TITLE",
+                content = "PREV_ENCRYPTED_CONTENT",
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+            )
+
+        `when`(getDiaryUseCase.getDiaryByDiaryId(diaryId, userId)).thenReturn(diary)
+        `when`(encryptDiaryUseCase.encryptDiary(updateContent)).thenReturn(encryptedContent)
+
+        val result = updateDiaryService.updateDiary(diaryId, userId, UpdateDiaryCommand(title, updateContent))
+
+        verify(getDiaryUseCase).getDiaryByDiaryId(diaryId, userId)
+        verify(encryptDiaryUseCase).encryptDiary(updateContent)
+        verify(updateDiaryPort).updateDiary(diaryId, title, encryptedContent)
+        assert(result)
     }
 
     @Test
     fun `본인 일기가 아니라면 수정 시 오류를 반환함`() {
-        throw NotImplementedError()
+        val userId = UUID.randomUUID()
+        val diaryId = 1L
+        val title = "FOO BAR"
+        val updateContent = "<p>Hello, World</p>"
+
+        `when`(getDiaryUseCase.getDiaryByDiaryId(diaryId, userId)).thenThrow(ServiceException(DiaryError.DIARY_IS_NOT_OWNED))
+
+        val exception =
+            assertThrows(ServiceException::class.java) {
+                updateDiaryService.updateDiary(diaryId, userId, UpdateDiaryCommand(title, updateContent))
+            }
+        assert(exception.error == DiaryError.DIARY_IS_NOT_OWNED)
     }
 
     @Test
