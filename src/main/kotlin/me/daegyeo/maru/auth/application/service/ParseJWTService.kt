@@ -22,6 +22,10 @@ class ParseJWTService : ParseJWTUseCase {
 
     override fun parseAccessToken(accessToken: String): AccessTokenPayload {
         try {
+            if (accessToken.isBlank()) {
+                throw ServiceException(AuthError.PERMISSION_DENIED)
+            }
+
             val payload =
                 Jwts.parser().verifyWith(Keys.hmacShaKeyFor(accessTokenSecret.toByteArray())).build()
                     .parseSignedClaims(accessToken).payload as Map<*, *>
