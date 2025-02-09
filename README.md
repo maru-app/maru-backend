@@ -2,7 +2,7 @@
 
 > 일기장 서비스 - 마루: 나만의 일기를 쓰는 공간.
 
-# 환경변수
+## 환경변수
 ```dotenv
 PORT=8080
 
@@ -31,11 +31,11 @@ DIARY_SECRET=
 CORS_ORIGINS=http://localhost:3000,http://frontend
 ```
 
-# 프론트엔드
+## 프론트엔드
 
 - [maru-frontend](https://github.com/SkyLightQP/maru-frontend)
 
-# 라이센스
+## 라이센스
 
 - [GNU Affero General Public License v3.0](./LICENSE)
 
