@@ -1,0 +1,14 @@
+services:
+    minio-dev:
+        image: minio/minio
+        restart: unless-stopped
+        container_name: minio-dev
+        command: server /data --console-address ":9001"
+        ports:
+            - "9000:9000"
+            - "9001:9001"
+        env_file:
+            - .env.docker.dev
+        volumes:
+            - ./minio/data:/data
+        shm_size: 1G
