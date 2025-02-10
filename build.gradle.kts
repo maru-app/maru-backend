@@ -22,6 +22,7 @@ repositories {
 
 val jjwtVersion = "0.12.6"
 val mockitoVersion = "5.4.0"
+val minioVersion = "8.5.7"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -33,6 +34,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:$jjwtVersion")
     implementation("io.jsonwebtoken:jjwt-impl:$jjwtVersion")
     implementation("io.jsonwebtoken:jjwt-jackson:$jjwtVersion")
+    implementation("io.minio:minio:$minioVersion")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
