@@ -37,5 +37,6 @@ CORS_ORIGINS=http://localhost:3000,http://frontend
 
 ## 라이센스
 
+- 해당 프로젝트는 일기장 파일 관리를 위해 [`minio`](https://github.com/minio/minio) 프로젝트를 사용하고 있습니다. 이에 따라 `AGPL` 라이센스를 적용받습니다.
 - [GNU Affero General Public License v3.0](./LICENSE)
 
