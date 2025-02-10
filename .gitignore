@@ -39,4 +39,9 @@ out/
 ### Kotlin ###
 .kotlin
 
+# Environment
 .env
+.env.docker.dev
+
+# Docker Data
+/minio/
