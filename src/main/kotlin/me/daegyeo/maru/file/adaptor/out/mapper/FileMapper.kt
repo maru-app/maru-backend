@@ -11,6 +11,7 @@ class FileMapper {
             fileId = fileEntity.fileId!!,
             path = fileEntity.path,
             originalPath = fileEntity.originalPath,
+            status = fileEntity.status,
             userId = fileEntity.userId,
             createdAt = fileEntity.createdAt!!,
             updatedAt = fileEntity.updatedAt!!,
