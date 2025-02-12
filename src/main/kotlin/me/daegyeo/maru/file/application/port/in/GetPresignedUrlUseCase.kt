@@ -1,10 +1,15 @@
 package me.daegyeo.maru.file.application.port.`in`
 
-import io.minio.http.Method
+import java.util.UUID
 
-fun interface GetPresignedUrlUseCase {
-    fun getPresignedUrl(
+interface GetPresignedUrlUseCase {
+    fun getPresignedGetUrl(
+        fileName: String,
+        userId: UUID,
+    ): String
+
+    fun getPresignedPutUrl(
         originalFileName: String,
-        method: Method,
+        userId: UUID,
     ): String
 }
