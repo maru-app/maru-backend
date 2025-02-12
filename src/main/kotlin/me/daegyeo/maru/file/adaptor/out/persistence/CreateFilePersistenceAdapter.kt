@@ -18,6 +18,7 @@ class CreateFilePersistenceAdapter(
                 userId = input.userId,
                 path = input.path,
                 originalPath = input.originalPath,
+                status = input.status,
             )
 
         val savedFile = fileRepository.save(file)
