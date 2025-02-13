@@ -10,4 +10,6 @@ interface FileRepository : JpaRepository<FileEntity, Long> {
         path: String,
         userId: UUID,
     ): Optional<FileEntity>
+
+    fun findByPath(path: String): Optional<FileEntity>
 }
