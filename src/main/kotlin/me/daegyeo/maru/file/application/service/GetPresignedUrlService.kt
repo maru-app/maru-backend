@@ -4,6 +4,7 @@ import io.minio.GetPresignedObjectUrlArgs
 import io.minio.MinioClient
 import io.minio.errors.MinioException
 import io.minio.http.Method
+import me.daegyeo.maru.file.application.domain.PresignedUrl
 import me.daegyeo.maru.file.application.error.FileError
 import me.daegyeo.maru.file.application.port.`in`.GetPresignedUrlUseCase
 import me.daegyeo.maru.file.application.port.out.CreateFilePort
@@ -34,21 +35,24 @@ class GetPresignedUrlService(
     override fun getPresignedGetUrl(
         fileName: String,
         userId: UUID,
-    ): String {
+    ): PresignedUrl {
         val fileDomain =
             readFilePort.readFileByPathAndUserId(fileName, userId)
                 ?: throw ServiceException(FileError.FILE_NOT_FOUND)
 
         val presignedUrl = generatePresignedUrl(fileDomain.path, Method.GET)
 
-        return presignedUrl
+        return PresignedUrl(
+            url = presignedUrl,
+            fileName = fileDomain.path,
+        )
     }
 
     @Transactional
     override fun getPresignedPutUrl(
         originalFileName: String,
         userId: UUID,
-    ): String {
+    ): PresignedUrl {
         val extension = originalFileName.substringAfterLast(".")
         val objectName = UUID.randomUUID().toString()
         val fileName = "$objectName.$extension"
@@ -63,7 +67,10 @@ class GetPresignedUrlService(
             ),
         )
 
-        return presignedUrl
+        return PresignedUrl(
+            url = presignedUrl,
+            fileName = fileName,
+        )
     }
 
     private fun generatePresignedUrl(
