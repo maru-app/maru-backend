@@ -1,5 +1,13 @@
 package me.daegyeo.maru.file.application.port.out
 
-fun interface DeleteFilePort {
+import me.daegyeo.maru.file.constant.FileStatus
+import java.time.ZonedDateTime
+
+interface DeleteFilePort {
     fun deleteFile(fileId: Long): Boolean
+
+    fun deleteFileByStatusAndCreatedAtBefore(
+        status: FileStatus,
+        dateTime: ZonedDateTime,
+    ): Boolean
 }
