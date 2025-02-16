@@ -18,7 +18,7 @@ class FileController(
     private val fileUploadSuccessUseCase: FileUploadSuccessUseCase,
 ) {
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/upload")
+    @PostMapping("/upload")
     fun getUploadPresignedUrl(
         @RequestBody body: GetUploadPresignedUrlDto,
         @AuthenticationPrincipal auth: CustomUserDetails,
@@ -27,7 +27,7 @@ class FileController(
     }
 
     @PreAuthorize("hasRole('USER')")
-    @GetMapping("/download")
+    @PostMapping("/download")
     fun getDownloadPresignedUrl(
         @RequestBody body: GetDownloadPresignedUrlDto,
         @AuthenticationPrincipal auth: CustomUserDetails,
