@@ -8,11 +8,11 @@ class GetImagePathInContentService : GetImagePathInContentUseCase {
     override fun getImagePathInContent(content: String): List<String> {
         val imageRegex = "\\[image\\|([^]]+)]".toRegex()
         var matchResult = imageRegex.find(content)
-        val imagePaths = listOf<String>()
+        val imagePaths = mutableListOf<String>()
         while (matchResult != null) {
             val fileName = matchResult.groupValues[1]
-            imagePaths.plus(fileName)
-            matchResult = imageRegex.find(content)
+            imagePaths.add(fileName)
+            matchResult = matchResult.next()
         }
         return imagePaths
     }
