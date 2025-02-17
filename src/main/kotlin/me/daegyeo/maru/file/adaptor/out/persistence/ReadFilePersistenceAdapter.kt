@@ -3,7 +3,6 @@ package me.daegyeo.maru.file.adaptor.out.persistence
 import me.daegyeo.maru.diary.adaptor.out.mapper.FileMapper
 import me.daegyeo.maru.file.application.domain.File
 import me.daegyeo.maru.file.application.port.out.ReadFilePort
-import me.daegyeo.maru.file.constant.FileStatus
 import org.springframework.stereotype.Component
 import java.util.UUID
 import kotlin.jvm.optionals.getOrNull
@@ -24,11 +23,7 @@ class ReadFilePersistenceAdapter(
     ): File? {
         val file = fileRepository.findByPathAndUserId(path, userId).getOrNull()
         return file?.let {
-            if (it.status != FileStatus.UPLOADED) {
-                null
-            } else {
-                fileMapper.toDomain(it)
-            }
+            fileMapper.toDomain(it)
         }
     }
 }
