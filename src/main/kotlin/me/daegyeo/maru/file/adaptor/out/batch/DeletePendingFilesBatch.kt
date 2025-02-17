@@ -18,7 +18,7 @@ import org.springframework.transaction.PlatformTransactionManager
 import java.time.ZonedDateTime
 
 @Configuration
-class FileBatchConfiguration(
+class DeletePendingFilesBatch(
     private val deleteFilePort: DeleteFilePort,
     private val transactionManager: PlatformTransactionManager,
     private val jobRepository: JobRepository,
