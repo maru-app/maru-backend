@@ -19,4 +19,6 @@ interface FileRepository : JpaRepository<FileEntity, Long> {
         status: FileStatus,
         dateTime: ZonedDateTime,
     )
+
+    fun findByStatus(status: FileStatus): List<FileEntity>
 }
