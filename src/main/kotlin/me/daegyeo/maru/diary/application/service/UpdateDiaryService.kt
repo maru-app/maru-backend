@@ -27,6 +27,7 @@ class UpdateDiaryService(
     ): Boolean {
         val isExistsAndOwnedDiary = getDiaryUseCase.getDiaryByDiaryId(diaryId, userId)
 
+        // TODO: 기존에 있던 이미지가 수정 과정 중에 삭제됐을 경우 해당 이미지의 상태를 변경하는 로직 필요
         val imagePaths = getImagePathInContentService.getImagePathInContent(input.content)
         imagePaths.forEach {
             updateFilePort.updateFileStatus(it, FileStatus.USED)
