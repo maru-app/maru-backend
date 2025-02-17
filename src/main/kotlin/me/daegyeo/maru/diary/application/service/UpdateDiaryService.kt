@@ -2,6 +2,7 @@ package me.daegyeo.maru.diary.application.service
 
 import me.daegyeo.maru.diary.application.port.`in`.EncryptDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.GetDiaryUseCase
+import me.daegyeo.maru.diary.application.port.`in`.GetImagePathInContentUseCase
 import me.daegyeo.maru.diary.application.port.`in`.UpdateDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.command.UpdateDiaryCommand
 import me.daegyeo.maru.diary.application.port.out.UpdateDiaryPort
@@ -17,7 +18,7 @@ class UpdateDiaryService(
     private val getDiaryUseCase: GetDiaryUseCase,
     private val updateFilePort: UpdateFilePort,
     private val encryptDiaryUseCase: EncryptDiaryUseCase,
-    private val getImagePathInContentService: GetImagePathInContentService,
+    private val getImagePathInContentUseCase: GetImagePathInContentUseCase,
 ) : UpdateDiaryUseCase {
     @Transactional
     override fun updateDiary(
@@ -28,7 +29,7 @@ class UpdateDiaryService(
         val isExistsAndOwnedDiary = getDiaryUseCase.getDiaryByDiaryId(diaryId, userId)
 
         // TODO: 기존에 있던 이미지가 수정 과정 중에 삭제됐을 경우 해당 이미지의 상태를 변경하는 로직 필요
-        val imagePaths = getImagePathInContentService.getImagePathInContent(input.content)
+        val imagePaths = getImagePathInContentUseCase.getImagePathInContent(input.content)
         imagePaths.forEach {
             updateFilePort.updateFileStatus(it, FileStatus.USED)
         }

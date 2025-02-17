@@ -6,10 +6,12 @@ import me.daegyeo.maru.diary.application.error.DiaryError
 import me.daegyeo.maru.diary.application.port.`in`.DecryptDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.EncryptDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.GetDiaryUseCase
+import me.daegyeo.maru.diary.application.port.`in`.GetImagePathInContentUseCase
 import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
 import me.daegyeo.maru.diary.application.port.`in`.command.UpdateDiaryCommand
 import me.daegyeo.maru.diary.application.port.out.*
 import me.daegyeo.maru.diary.application.service.*
+import me.daegyeo.maru.file.application.port.out.UpdateFilePort
 import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
 import me.daegyeo.maru.user.application.domain.User
@@ -35,10 +37,14 @@ class DiaryUnitTest {
     private val encryptDiaryUseCase = mock(EncryptDiaryUseCase::class.java)
     private val decryptDiaryUseCase = mock(DecryptDiaryUseCase::class.java)
     private val getDiaryUseCase = mock(GetDiaryUseCase::class.java)
-    private val createDiaryService = CreateDiaryService(getUserUseCase, createDiaryPort, encryptDiaryUseCase)
+    private val getImagePathInContentUseCase = mock(GetImagePathInContentUseCase::class.java)
+    private val updateFilePort = mock(UpdateFilePort::class.java)
+    private val createDiaryService =
+        CreateDiaryService(getUserUseCase, createDiaryPort, updateFilePort, encryptDiaryUseCase, getImagePathInContentUseCase)
     private val getAllDiaryService = GetAllDiaryService(readAllDiaryPort)
     private val getDiaryService = GetDiaryService(readDiaryPort, decryptDiaryUseCase)
-    private val updateDiaryService = UpdateDiaryService(updateDiaryPort, getDiaryUseCase, encryptDiaryUseCase)
+    private val updateDiaryService =
+        UpdateDiaryService(updateDiaryPort, getDiaryUseCase, updateFilePort, encryptDiaryUseCase, getImagePathInContentUseCase)
     private val deleteDiaryService = DeleteDiaryService(deleteDiaryPort, getDiaryUseCase)
 
     @Test

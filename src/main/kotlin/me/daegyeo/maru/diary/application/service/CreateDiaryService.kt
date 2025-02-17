@@ -3,6 +3,7 @@ package me.daegyeo.maru.diary.application.service
 import me.daegyeo.maru.diary.application.domain.Diary
 import me.daegyeo.maru.diary.application.port.`in`.CreateDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.EncryptDiaryUseCase
+import me.daegyeo.maru.diary.application.port.`in`.GetImagePathInContentUseCase
 import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
 import me.daegyeo.maru.diary.application.port.out.CreateDiaryPort
 import me.daegyeo.maru.diary.application.port.out.dto.CreateDiaryDto
@@ -18,14 +19,14 @@ class CreateDiaryService(
     private val createDiaryPort: CreateDiaryPort,
     private val updateFilePort: UpdateFilePort,
     private val encryptDiaryUseCase: EncryptDiaryUseCase,
-    private val getImagePathInContentService: GetImagePathInContentService,
+    private val getImagePathInContentUseCase: GetImagePathInContentUseCase,
 ) :
     CreateDiaryUseCase {
     @Transactional
     override fun createDiary(input: CreateDiaryCommand): Diary {
         val user = getUserUseCase.getUser(input.userId)
 
-        val imagePaths = getImagePathInContentService.getImagePathInContent(input.content)
+        val imagePaths = getImagePathInContentUseCase.getImagePathInContent(input.content)
         imagePaths.forEach {
             updateFilePort.updateFileStatus(it, FileStatus.USED)
         }
