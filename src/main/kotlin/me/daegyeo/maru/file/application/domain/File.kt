@@ -12,4 +12,5 @@ data class File(
     val userId: UUID,
     val createdAt: ZonedDateTime,
     val updatedAt: ZonedDateTime,
+    val deletedAt: ZonedDateTime? = null,
 )

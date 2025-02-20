@@ -9,4 +9,5 @@ data class Diary(
     var content: String,
     val createdAt: ZonedDateTime,
     val updatedAt: ZonedDateTime,
+    val deletedAt: ZonedDateTime? = null,
 )

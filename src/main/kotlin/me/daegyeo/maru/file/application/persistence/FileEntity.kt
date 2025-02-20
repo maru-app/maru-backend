@@ -5,10 +5,15 @@ import me.daegyeo.maru.file.constant.FileStatus
 import me.daegyeo.maru.shared.entity.AuditDateTimeEntity
 import me.daegyeo.maru.user.application.persistence.UserEntity
 import org.hibernate.annotations.ColumnDefault
+import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.SQLRestriction
+import java.time.ZonedDateTime
 import java.util.UUID
 
 @Entity
 @Table(name = "files")
+@SQLDelete(sql = "UPDATE files SET deleted_at = now() WHERE file_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 class FileEntity(
     @Column(nullable = false)
     val path: String,
@@ -27,6 +32,9 @@ class FileEntity(
 
     @Column(name = "user_id", nullable = false)
     val userId: UUID,
+
+    @Column(nullable = true, name = "deleted_at")
+    var deletedAt: ZonedDateTime? = null,
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

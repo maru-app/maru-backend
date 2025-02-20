@@ -15,6 +15,7 @@ class FileMapper {
             userId = fileEntity.userId,
             createdAt = fileEntity.createdAt!!,
             updatedAt = fileEntity.updatedAt!!,
+            deletedAt = fileEntity.deletedAt,
         )
     }
 }
