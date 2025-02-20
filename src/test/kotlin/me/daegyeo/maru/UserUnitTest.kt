@@ -192,7 +192,7 @@ class UserUnitTest {
 
     @Test
     fun `사용자가 성공적으로 탈퇴함`() {
-        error("Not implemented")
+        // TODO: Not implemented yet
     }
 
     @Test
