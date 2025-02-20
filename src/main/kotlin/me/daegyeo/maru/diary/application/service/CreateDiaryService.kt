@@ -40,6 +40,7 @@ class CreateDiaryService(
                     content = encryptedContent,
                 ),
             )
+
         return diary.let {
             it.content = ""
             it
