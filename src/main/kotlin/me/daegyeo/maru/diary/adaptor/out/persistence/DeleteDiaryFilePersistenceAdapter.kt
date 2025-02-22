@@ -16,4 +16,9 @@ class DeleteDiaryFilePersistenceAdapter(private val diaryFileRepository: DiaryFi
             true
         } ?: false
     }
+
+    override fun deleteAllByDiaryId(diaryId: Long): Boolean {
+        diaryFileRepository.deleteAllByDiaryId(diaryId)
+        return true
+    }
 }

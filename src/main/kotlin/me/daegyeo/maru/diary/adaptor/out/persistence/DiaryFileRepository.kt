@@ -11,4 +11,6 @@ interface DiaryFileRepository : JpaRepository<DiaryFileEntity, Long> {
     ): Optional<DiaryFileEntity>
 
     fun findAllByDiaryId(diaryId: Long): List<DiaryFileEntity>
+
+    fun deleteAllByDiaryId(diaryId: Long)
 }
