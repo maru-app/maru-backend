@@ -14,6 +14,7 @@ class DiaryMapper {
             content = diaryEntity.content,
             createdAt = diaryEntity.createdAt!!,
             updatedAt = diaryEntity.updatedAt!!,
+            deletedAt = diaryEntity.deletedAt,
         )
     }
 
@@ -25,6 +26,7 @@ class DiaryMapper {
             content = diaryEntity.content,
             createdAt = diaryEntity.createdAt!!,
             updatedAt = diaryEntity.updatedAt!!,
+            deletedAt = diaryEntity.deletedAt,
         )
     }
 }

@@ -1,14 +1,11 @@
 package me.daegyeo.maru.diary.application.domain
 
 import java.time.ZonedDateTime
-import java.util.UUID
 
-data class DiaryWithUserId(
+data class DiaryFile(
+    val diaryFileId: Long,
     val diaryId: Long,
-    val userId: UUID,
-    var title: String,
-    var content: String,
+    val fileId: Long,
     val createdAt: ZonedDateTime,
     val updatedAt: ZonedDateTime,
-    val deletedAt: ZonedDateTime? = null,
 )

@@ -11,5 +11,5 @@ data class User(
     var nickname: String,
     val createdAt: ZonedDateTime,
     val updatedAt: ZonedDateTime,
-    var deletedAt: ZonedDateTime?,
+    var deletedAt: ZonedDateTime? = null,
 )

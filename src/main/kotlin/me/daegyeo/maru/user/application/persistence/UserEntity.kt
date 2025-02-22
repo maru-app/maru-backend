@@ -24,7 +24,7 @@ class UserEntity(
     var nickname: String,
 
     @Column(nullable = true, name = "deleted_at")
-    var deletedAt: ZonedDateTime?,
+    var deletedAt: ZonedDateTime? = null,
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
