@@ -21,7 +21,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.transaction.PlatformTransactionManager
 
 @Configuration
-class DeleteUploadedFilesBatch(
+class CleanUpFileObjectsBatch(
     private val deleteFilePort: DeleteFilePort,
     private val readAllFilePort: ReadAllFilePort,
     private val transactionManager: PlatformTransactionManager,
@@ -32,7 +32,7 @@ class DeleteUploadedFilesBatch(
     @Value("\${minio.bucket-name}")
     private lateinit var bucket: String
 
-    fun deleteUploadedFilesTasklet(): Tasklet {
+    fun cleanUpFileObjectsTasklet(): Tasklet {
         return Tasklet { _, _ ->
             val orphanedFiles = readAllFilePort.readAllFileByStatusIn(listOf(FileStatus.UPLOADED, FileStatus.ORPHANED))
             orphanedFiles.forEach {
@@ -45,25 +45,26 @@ class DeleteUploadedFilesBatch(
             }
 
             deleteFilePort.deleteUploadedOrOrphanedFile()
+
             RepeatStatus.FINISHED
         }
     }
 
-    fun deleteUploadedFilesStep(): Step {
-        return StepBuilder("deleteUploadedFilesStep", jobRepository)
-            .tasklet(deleteUploadedFilesTasklet(), transactionManager)
+    fun cleanUpFileObjectsStep(): Step {
+        return StepBuilder("cleanUpFileObjectsStep", jobRepository)
+            .tasklet(cleanUpFileObjectsTasklet(), transactionManager)
             .build()
     }
 
-    fun deleteUploadedFilesJob(): Job {
-        return JobBuilder("deleteUploadedFilesJob", jobRepository)
+    fun cleanUpFileObjectsJob(): Job {
+        return JobBuilder("cleanUpFileObjectsJob", jobRepository)
             .incrementer(RunIdIncrementer())
-            .start(deleteUploadedFilesStep())
+            .start(cleanUpFileObjectsStep())
             .build()
     }
 
     @Scheduled(cron = "0 0 6 * * 1")
-    fun deleteUploadedFilesJobSchedule() {
-        jobLauncher.run(deleteUploadedFilesJob(), JobParametersBuilder().toJobParameters())
+    fun cleanUpFileObjectsJobSchedule() {
+        jobLauncher.run(cleanUpFileObjectsJob(), JobParametersBuilder().toJobParameters())
     }
 }
