@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.transaction.PlatformTransactionManager
-import java.time.ZonedDateTime
 
 @Configuration
 class DeleteUploadedFilesBatch(
@@ -35,7 +34,7 @@ class DeleteUploadedFilesBatch(
 
     fun deleteUploadedFilesTasklet(): Tasklet {
         return Tasklet { _, _ ->
-            val orphanedFiles = readAllFilePort.readAllFileByStatus(FileStatus.UPLOADED)
+            val orphanedFiles = readAllFilePort.readAllFileByStatusIn(listOf(FileStatus.UPLOADED, FileStatus.ORPHANED))
             orphanedFiles.forEach {
                 minioClient.removeObject(
                     RemoveObjectArgs
@@ -45,7 +44,7 @@ class DeleteUploadedFilesBatch(
                 )
             }
 
-            deleteFilePort.deleteFileByStatusAndCreatedAtBefore(FileStatus.PENDING, ZonedDateTime.now())
+            deleteFilePort.deleteUploadedOrOrphanedFile()
             RepeatStatus.FINISHED
         }
     }
