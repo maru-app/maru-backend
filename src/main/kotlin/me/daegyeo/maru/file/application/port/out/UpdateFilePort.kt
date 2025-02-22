@@ -5,7 +5,7 @@ import me.daegyeo.maru.file.constant.FileStatus
 
 fun interface UpdateFilePort {
     fun updateFileStatus(
-        path: String,
+        fileId: Long,
         status: FileStatus,
     ): File?
 }

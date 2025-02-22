@@ -13,10 +13,10 @@ class UpdateFilePersistenceAdapter(
     private val fileMapper: FileMapper,
 ) : UpdateFilePort {
     override fun updateFileStatus(
-        path: String,
+        fileId: Long,
         status: FileStatus,
     ): File? {
-        val file = fileRepository.findByPath(path).getOrNull()
+        val file = fileRepository.findById(fileId).getOrNull()
         file?.let {
             it.status = status
             return fileMapper.toDomain(fileRepository.save(it))
