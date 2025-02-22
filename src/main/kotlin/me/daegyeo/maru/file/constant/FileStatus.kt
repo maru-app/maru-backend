@@ -4,4 +4,5 @@ enum class FileStatus {
     PENDING,
     UPLOADED,
     USED,
+    ORPHANED,
 }
