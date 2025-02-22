@@ -1,6 +1,7 @@
 package me.daegyeo.maru
 
 import me.daegyeo.maru.diary.application.domain.Diary
+import me.daegyeo.maru.diary.application.domain.DiaryFile
 import me.daegyeo.maru.diary.application.domain.DiaryWithUserId
 import me.daegyeo.maru.diary.application.error.DiaryError
 import me.daegyeo.maru.diary.application.port.`in`.DecryptDiaryUseCase
@@ -10,9 +11,12 @@ import me.daegyeo.maru.diary.application.port.`in`.GetImagePathInContentUseCase
 import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
 import me.daegyeo.maru.diary.application.port.`in`.command.UpdateDiaryCommand
 import me.daegyeo.maru.diary.application.port.out.*
+import me.daegyeo.maru.diary.application.port.out.dto.CreateDiaryFileDto
 import me.daegyeo.maru.diary.application.service.*
+import me.daegyeo.maru.file.application.domain.File
 import me.daegyeo.maru.file.application.port.out.ReadFilePort
 import me.daegyeo.maru.file.application.port.out.UpdateFilePort
+import me.daegyeo.maru.file.constant.FileStatus
 import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
 import me.daegyeo.maru.user.application.domain.User
@@ -149,7 +153,7 @@ class DiaryUnitTest {
     }
 
     @Test
-    fun `일기를 성공적으로 생성함`() {
+    fun `일기를 성공적으로 생성하고 이미지를 첨부함`() {
         val userId = UUID.randomUUID()
         val user =
             User(
@@ -172,21 +176,37 @@ class DiaryUnitTest {
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now(),
             )
+        val filePath = "foobar.png"
+        val file =
+            File(
+                fileId = 1,
+                userId = userId,
+                path = filePath,
+                originalPath = "original_foobar.png",
+                status = FileStatus.UPLOADED,
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+                deletedAt = null,
+            )
 
         `when`(getUserUseCase.getUser(userId)).thenReturn(user)
         `when`(encryptDiaryUseCase.encryptDiary(content)).thenReturn(encryptedContent)
         `when`(createDiaryPort.createDiary(any())).thenReturn(diary)
+        `when`(getImagePathInContentUseCase.getImagePathInContent(content)).thenReturn(listOf(filePath))
+        `when`(readFilePort.readFileByPathAndUserId(filePath, userId)).thenReturn(file)
 
         val result = createDiaryService.createDiary(CreateDiaryCommand(title, content, userId))
 
         verify(getUserUseCase).getUser(userId)
         verify(encryptDiaryUseCase).encryptDiary(content)
         verify(createDiaryPort).createDiary(any())
+        verify(updateFilePort).updateFileStatus(file.fileId, FileStatus.USED)
+        verify(createDiaryFilePort).createDiaryFile(CreateDiaryFileDto(diaryId = diary.diaryId, fileId = file.fileId))
         assert(result.title == title)
     }
 
     @Test
-    fun `일기를 성공적으로 수정함`() {
+    fun `일기를 성공적으로 수정하고 첨부된 이미지를 수정함`() {
         val userId = UUID.randomUUID()
         val diaryId = 1L
         val title = "FOO BAR"
@@ -200,15 +220,43 @@ class DiaryUnitTest {
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now(),
             )
+        val existsFile =
+            DiaryFile(
+                diaryFileId = 1,
+                diaryId = diaryId,
+                fileId = 1,
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+            )
+        val newFilePath = "new_foobar.png"
+        val newFile =
+            File(
+                fileId = 2,
+                userId = userId,
+                path = newFilePath,
+                originalPath = "new_original_foobar.png",
+                status = FileStatus.UPLOADED,
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+                deletedAt = null,
+            )
 
         `when`(getDiaryUseCase.getDiaryByDiaryId(diaryId, userId)).thenReturn(diary)
         `when`(encryptDiaryUseCase.encryptDiary(updateContent)).thenReturn(encryptedContent)
+        `when`(readAllDiaryFilePort.readAllDiaryFileByDiaryId(diaryId)).thenReturn(listOf(existsFile))
+        `when`(getImagePathInContentUseCase.getImagePathInContent(updateContent)).thenReturn(listOf(newFilePath))
+        `when`(readFilePort.readFileByPathAndUserId(newFilePath, userId)).thenReturn(newFile)
 
         val result = updateDiaryService.updateDiary(diaryId, userId, UpdateDiaryCommand(title, updateContent))
 
         verify(getDiaryUseCase).getDiaryByDiaryId(diaryId, userId)
         verify(encryptDiaryUseCase).encryptDiary(updateContent)
         verify(updateDiaryPort).updateDiary(diaryId, title, encryptedContent)
+        verify(deleteDiaryFilePort).deleteDiaryFile(existsFile.diaryId, existsFile.fileId)
+        verify(updateFilePort).updateFileStatus(existsFile.fileId, FileStatus.ORPHANED)
+        verify(updateFilePort).updateFileStatus(newFile.fileId, FileStatus.USED)
+        verify(createDiaryFilePort).createDiaryFile(CreateDiaryFileDto(diaryId = diaryId, fileId = newFile.fileId))
+
         assert(result)
     }
 
