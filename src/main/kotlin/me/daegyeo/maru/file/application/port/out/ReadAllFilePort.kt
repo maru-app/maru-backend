@@ -4,5 +4,5 @@ import me.daegyeo.maru.file.application.domain.File
 import me.daegyeo.maru.file.constant.FileStatus
 
 fun interface ReadAllFilePort {
-    fun readAllFileByStatus(status: FileStatus): List<File>
+    fun readAllFileByStatusIn(status: Collection<FileStatus>): List<File>
 }
