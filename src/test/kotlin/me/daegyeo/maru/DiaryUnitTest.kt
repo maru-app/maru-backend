@@ -75,6 +75,7 @@ class DiaryUnitTest {
             getImagePathInContentUseCase,
         )
     private val deleteDiaryService = DeleteDiaryService(deleteDiaryPort, getDiaryUseCase)
+    private val getImagePathInContentService = GetImagePathInContentService()
 
     @Test
     fun `일기를 성공적으로 가져옴`() {
@@ -321,5 +322,12 @@ class DiaryUnitTest {
                 deleteDiaryService.deleteDiary(diaryId, userId)
             }
         assert(exception.error == DiaryError.DIARY_IS_NOT_OWNED)
+    }
+
+    @Test
+    fun `일기 내용에서 첨부된 이미지 링크만 가져옴`() {
+        val content = "<p>Hello, World</p>[image|foobar.png]<p>GoodBye</p>"
+        val result = getImagePathInContentService.getImagePathInContent(content)
+        assert(result == listOf("foobar.png"))
     }
 }
