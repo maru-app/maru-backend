@@ -1,4 +1,4 @@
-# maru-backend ![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?logo=kotlin&logoColor=white) 	![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?logo=spring&logoColor=white)
+# maru-backend ![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?logo=kotlin&logoColor=white) 	![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?logo=spring&logoColor=white) [![Check ktlint and Run unit tests](https://github.com/SkyLightQP/maru-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/SkyLightQP/maru-backend/actions/workflows/ci.yml)
 
 > 일기장 서비스 - 마루: 나만의 일기를 쓰는 공간.
 
