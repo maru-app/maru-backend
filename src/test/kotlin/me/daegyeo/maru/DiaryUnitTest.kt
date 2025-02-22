@@ -11,6 +11,7 @@ import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
 import me.daegyeo.maru.diary.application.port.`in`.command.UpdateDiaryCommand
 import me.daegyeo.maru.diary.application.port.out.*
 import me.daegyeo.maru.diary.application.service.*
+import me.daegyeo.maru.file.application.port.out.ReadFilePort
 import me.daegyeo.maru.file.application.port.out.UpdateFilePort
 import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
@@ -34,17 +35,41 @@ class DiaryUnitTest {
     private val readDiaryPort = mock(ReadDiaryPort::class.java)
     private val updateDiaryPort = mock(UpdateDiaryPort::class.java)
     private val deleteDiaryPort = mock(DeleteDiaryPort::class.java)
+    private val readFilePort = mock(ReadFilePort::class.java)
+    private val updateFilePort = mock(UpdateFilePort::class.java)
+    private val createDiaryFilePort = mock(CreateDiaryFilePort::class.java)
+    private val readAllDiaryFilePort = mock(ReadAllDiaryFilePort::class.java)
+    private val deleteDiaryFilePort = mock(DeleteDiaryFilePort::class.java)
+
     private val encryptDiaryUseCase = mock(EncryptDiaryUseCase::class.java)
     private val decryptDiaryUseCase = mock(DecryptDiaryUseCase::class.java)
     private val getDiaryUseCase = mock(GetDiaryUseCase::class.java)
     private val getImagePathInContentUseCase = mock(GetImagePathInContentUseCase::class.java)
-    private val updateFilePort = mock(UpdateFilePort::class.java)
+
     private val createDiaryService =
-        CreateDiaryService(getUserUseCase, createDiaryPort, updateFilePort, encryptDiaryUseCase, getImagePathInContentUseCase)
+        CreateDiaryService(
+            getUserUseCase,
+            createDiaryPort,
+            createDiaryFilePort,
+            readFilePort,
+            updateFilePort,
+            encryptDiaryUseCase,
+            getImagePathInContentUseCase,
+        )
     private val getAllDiaryService = GetAllDiaryService(readAllDiaryPort)
     private val getDiaryService = GetDiaryService(readDiaryPort, decryptDiaryUseCase)
     private val updateDiaryService =
-        UpdateDiaryService(updateDiaryPort, getDiaryUseCase, updateFilePort, encryptDiaryUseCase, getImagePathInContentUseCase)
+        UpdateDiaryService(
+            updateDiaryPort,
+            getDiaryUseCase,
+            readFilePort,
+            updateFilePort,
+            readAllDiaryFilePort,
+            createDiaryFilePort,
+            deleteDiaryFilePort,
+            encryptDiaryUseCase,
+            getImagePathInContentUseCase,
+        )
     private val deleteDiaryService = DeleteDiaryService(deleteDiaryPort, getDiaryUseCase)
 
     @Test
