@@ -10,4 +10,6 @@ interface ReadFilePort {
         path: String,
         userId: UUID,
     ): File?
+
+    fun readFileByPath(path: String): File?
 }

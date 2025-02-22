@@ -26,4 +26,11 @@ class ReadFilePersistenceAdapter(
             fileMapper.toDomain(it)
         }
     }
+
+    override fun readFileByPath(path: String): File? {
+        val file = fileRepository.findByPath(path).getOrNull()
+        return file?.let {
+            fileMapper.toDomain(it)
+        }
+    }
 }
