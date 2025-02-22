@@ -10,4 +10,6 @@ interface DeleteFilePort {
         status: FileStatus,
         dateTime: ZonedDateTime,
     ): Boolean
+
+    fun deleteUploadedOrOrphanedFile(): Boolean
 }
