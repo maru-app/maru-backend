@@ -1,17 +1,13 @@
 package me.daegyeo.maru.diary.application.service
 
 import me.daegyeo.maru.diary.application.domain.Diary
+import me.daegyeo.maru.diary.application.port.`in`.AttachDiaryFileFromContentUseCase
 import me.daegyeo.maru.diary.application.port.`in`.CreateDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.EncryptDiaryUseCase
-import me.daegyeo.maru.diary.application.port.`in`.GetImagePathInContentUseCase
+import me.daegyeo.maru.diary.application.port.`in`.command.AttachDiaryFileFromContentCommand
 import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
-import me.daegyeo.maru.diary.application.port.out.CreateDiaryFilePort
 import me.daegyeo.maru.diary.application.port.out.CreateDiaryPort
 import me.daegyeo.maru.diary.application.port.out.dto.CreateDiaryDto
-import me.daegyeo.maru.diary.application.port.out.dto.CreateDiaryFileDto
-import me.daegyeo.maru.file.application.port.out.ReadFilePort
-import me.daegyeo.maru.file.application.port.out.UpdateFilePort
-import me.daegyeo.maru.file.constant.FileStatus
 import me.daegyeo.maru.user.application.port.`in`.GetUserUseCase
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -20,11 +16,8 @@ import org.springframework.transaction.annotation.Transactional
 class CreateDiaryService(
     private val getUserUseCase: GetUserUseCase,
     private val createDiaryPort: CreateDiaryPort,
-    private val createDiaryFilePort: CreateDiaryFilePort,
-    private val readFilePort: ReadFilePort,
-    private val updateFilePort: UpdateFilePort,
     private val encryptDiaryUseCase: EncryptDiaryUseCase,
-    private val getImagePathInContentUseCase: GetImagePathInContentUseCase,
+    private val attachDiaryFileFromContentUseCase: AttachDiaryFileFromContentUseCase,
 ) :
     CreateDiaryUseCase {
     @Transactional
@@ -41,17 +34,13 @@ class CreateDiaryService(
                 ),
             )
 
-        val imagePaths = getImagePathInContentUseCase.getImagePathInContent(input.content)
-        imagePaths.forEach {
-            val file = readFilePort.readFileByPathAndUserId(it, user.userId) ?: return@forEach
-            updateFilePort.updateFileStatus(file.fileId, FileStatus.USED)
-            createDiaryFilePort.createDiaryFile(
-                CreateDiaryFileDto(
-                    diaryId = diary.diaryId,
-                    fileId = file.fileId,
-                ),
-            )
-        }
+        attachDiaryFileFromContentUseCase.attachDiaryFileFromContent(
+            AttachDiaryFileFromContentCommand(
+                userId = user.userId,
+                diaryId = diary.diaryId,
+                content = input.content,
+            ),
+        )
 
         return diary.let {
             it.content = ""
