@@ -1,5 +1,6 @@
 package me.daegyeo.maru
 
+import io.minio.MinioClient
 import me.daegyeo.maru.diary.application.domain.Diary
 import me.daegyeo.maru.diary.application.domain.DiaryFile
 import me.daegyeo.maru.diary.application.domain.DiaryWithUserId
@@ -22,6 +23,7 @@ import me.daegyeo.maru.shared.exception.ServiceException
 import me.daegyeo.maru.user.application.domain.User
 import me.daegyeo.maru.user.application.port.`in`.GetUserUseCase
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.*
@@ -33,6 +35,8 @@ import java.util.UUID
 @Suppress("NonAsciiCharacters")
 @ExtendWith(MockitoExtension::class)
 class DiaryUnitTest {
+    private val minioClient = mock(MinioClient::class.java)
+
     private val getUserUseCase = mock(GetUserUseCase::class.java)
     private val createDiaryPort = mock(CreateDiaryPort::class.java)
     private val readAllDiaryPort = mock(ReadAllDiaryPort::class.java)
@@ -74,8 +78,17 @@ class DiaryUnitTest {
             encryptDiaryUseCase,
             getImagePathInContentUseCase,
         )
-    private val deleteDiaryService = DeleteDiaryService(deleteDiaryPort, getDiaryUseCase)
+    private val deleteDiaryService =
+        DeleteDiaryService(deleteDiaryPort, getDiaryUseCase, readAllDiaryFilePort, deleteDiaryFilePort, minioClient)
     private val getImagePathInContentService = GetImagePathInContentService()
+
+    @BeforeEach
+    fun setup() {
+        DeleteDiaryService::class.java.getDeclaredField("bucket").apply {
+            isAccessible = true
+            set(deleteDiaryService, "test-bucket")
+        }
+    }
 
     @Test
     fun `일기를 성공적으로 가져옴`() {
@@ -301,6 +314,8 @@ class DiaryUnitTest {
         val result = deleteDiaryService.deleteDiary(diaryId, userId)
 
         verify(getDiaryUseCase).getDiaryByDiaryId(diaryId, userId)
+        verify(deleteDiaryPort).deleteDiary(diaryId)
+        verify(deleteDiaryFilePort).deleteAllByDiaryId(diaryId)
         verify(deleteDiaryPort).deleteDiary(diaryId)
         assert(result)
     }
