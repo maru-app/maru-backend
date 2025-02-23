@@ -13,6 +13,7 @@ import me.daegyeo.maru.diary.application.port.out.*
 import me.daegyeo.maru.diary.application.port.out.dto.CreateDiaryFileDto
 import me.daegyeo.maru.diary.application.service.*
 import me.daegyeo.maru.file.application.domain.File
+import me.daegyeo.maru.file.application.port.out.DeleteFilePort
 import me.daegyeo.maru.file.application.port.out.ReadFilePort
 import me.daegyeo.maru.file.application.port.out.UpdateFilePort
 import me.daegyeo.maru.file.constant.FileStatus
@@ -43,6 +44,7 @@ class DiaryUnitTest {
     private val deleteDiaryPort = mock(DeleteDiaryPort::class.java)
     private val readFilePort = mock(ReadFilePort::class.java)
     private val updateFilePort = mock(UpdateFilePort::class.java)
+    private val deleteFilePort = mock(DeleteFilePort::class.java)
     private val createDiaryFilePort = mock(CreateDiaryFilePort::class.java)
     private val readAllDiaryFilePort = mock(ReadAllDiaryFilePort::class.java)
     private val deleteDiaryFilePort = mock(DeleteDiaryFilePort::class.java)
@@ -73,7 +75,14 @@ class DiaryUnitTest {
             attachDiaryFileFromContentUseCase,
         )
     private val deleteDiaryService =
-        DeleteDiaryService(deleteDiaryPort, getDiaryUseCase, readAllDiaryFilePort, deleteDiaryFilePort, minioClient)
+        DeleteDiaryService(
+            deleteDiaryPort,
+            getDiaryUseCase,
+            readAllDiaryFilePort,
+            deleteDiaryFilePort,
+            deleteFilePort,
+            minioClient,
+        )
     private val getImagePathInContentService = GetImagePathInContentService()
     private val attachDiaryFileFromContentService =
         AttachDiaryFileFromContentService(
@@ -313,6 +322,7 @@ class DiaryUnitTest {
         verify(getDiaryUseCase).getDiaryByDiaryId(diaryId, userId)
         verify(deleteDiaryPort).deleteDiary(diaryId)
         verify(deleteDiaryFilePort).deleteAllByDiaryId(diaryId)
+        verify(deleteFilePort).deleteFile(any())
         verify(deleteDiaryPort).deleteDiary(diaryId)
         assert(result)
     }
