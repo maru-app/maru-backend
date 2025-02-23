@@ -5,10 +5,8 @@ import me.daegyeo.maru.diary.application.domain.Diary
 import me.daegyeo.maru.diary.application.domain.DiaryFile
 import me.daegyeo.maru.diary.application.domain.DiaryWithUserId
 import me.daegyeo.maru.diary.application.error.DiaryError
-import me.daegyeo.maru.diary.application.port.`in`.DecryptDiaryUseCase
-import me.daegyeo.maru.diary.application.port.`in`.EncryptDiaryUseCase
-import me.daegyeo.maru.diary.application.port.`in`.GetDiaryUseCase
-import me.daegyeo.maru.diary.application.port.`in`.GetImagePathInContentUseCase
+import me.daegyeo.maru.diary.application.port.`in`.*
+import me.daegyeo.maru.diary.application.port.`in`.command.AttachDiaryFileFromContentCommand
 import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
 import me.daegyeo.maru.diary.application.port.`in`.command.UpdateDiaryCommand
 import me.daegyeo.maru.diary.application.port.out.*
@@ -53,16 +51,14 @@ class DiaryUnitTest {
     private val decryptDiaryUseCase = mock(DecryptDiaryUseCase::class.java)
     private val getDiaryUseCase = mock(GetDiaryUseCase::class.java)
     private val getImagePathInContentUseCase = mock(GetImagePathInContentUseCase::class.java)
+    private val attachDiaryFileFromContentUseCase = mock(AttachDiaryFileFromContentUseCase::class.java)
 
     private val createDiaryService =
         CreateDiaryService(
             getUserUseCase,
             createDiaryPort,
-            createDiaryFilePort,
-            readFilePort,
-            updateFilePort,
             encryptDiaryUseCase,
-            getImagePathInContentUseCase,
+            attachDiaryFileFromContentUseCase,
         )
     private val getAllDiaryService = GetAllDiaryService(readAllDiaryPort)
     private val getDiaryService = GetDiaryService(readDiaryPort, decryptDiaryUseCase)
@@ -70,17 +66,22 @@ class DiaryUnitTest {
         UpdateDiaryService(
             updateDiaryPort,
             getDiaryUseCase,
-            readFilePort,
             updateFilePort,
             readAllDiaryFilePort,
-            createDiaryFilePort,
             deleteDiaryFilePort,
             encryptDiaryUseCase,
-            getImagePathInContentUseCase,
+            attachDiaryFileFromContentUseCase,
         )
     private val deleteDiaryService =
         DeleteDiaryService(deleteDiaryPort, getDiaryUseCase, readAllDiaryFilePort, deleteDiaryFilePort, minioClient)
     private val getImagePathInContentService = GetImagePathInContentService()
+    private val attachDiaryFileFromContentService =
+        AttachDiaryFileFromContentService(
+            readFilePort,
+            updateFilePort,
+            createDiaryFilePort,
+            getImagePathInContentUseCase,
+        )
 
     @BeforeEach
     fun setup() {
@@ -167,7 +168,7 @@ class DiaryUnitTest {
     }
 
     @Test
-    fun `일기를 성공적으로 생성하고 이미지를 첨부함`() {
+    fun `일기를 성공적으로 생성함`() {
         val userId = UUID.randomUUID()
         val user =
             User(
@@ -214,13 +215,11 @@ class DiaryUnitTest {
         verify(getUserUseCase).getUser(userId)
         verify(encryptDiaryUseCase).encryptDiary(content)
         verify(createDiaryPort).createDiary(any())
-        verify(updateFilePort).updateFileStatus(file.fileId, FileStatus.USED)
-        verify(createDiaryFilePort).createDiaryFile(CreateDiaryFileDto(diaryId = diary.diaryId, fileId = file.fileId))
         assert(result.title == title)
     }
 
     @Test
-    fun `일기를 성공적으로 수정하고 첨부된 이미지를 수정함`() {
+    fun `일기를 성공적으로 수정하고 기존에 첨부된 이미지를 정리함`() {
         val userId = UUID.randomUUID()
         val diaryId = 1L
         val title = "FOO BAR"
@@ -268,8 +267,6 @@ class DiaryUnitTest {
         verify(updateDiaryPort).updateDiary(diaryId, title, encryptedContent)
         verify(deleteDiaryFilePort).deleteDiaryFile(existsFile.diaryId, existsFile.fileId)
         verify(updateFilePort).updateFileStatus(existsFile.fileId, FileStatus.ORPHANED)
-        verify(updateFilePort).updateFileStatus(newFile.fileId, FileStatus.USED)
-        verify(createDiaryFilePort).createDiaryFile(CreateDiaryFileDto(diaryId = diaryId, fileId = newFile.fileId))
 
         assert(result)
     }
@@ -344,5 +341,35 @@ class DiaryUnitTest {
         val content = "<p>Hello, World</p>[image|foobar.png]<p>GoodBye</p>"
         val result = getImagePathInContentService.getImagePathInContent(content)
         assert(result == listOf("foobar.png"))
+    }
+
+    @Test
+    fun `일기 내용에서 이미지 링크를 가져와 DiaryFile에 연결함`() {
+        val userId = UUID.randomUUID()
+        val diaryId = 1L
+        val content = "<p>Hello, World</p>[image|foobar.png]<p>GoodBye</p>"
+        val filePath = "foobar.png"
+        val file =
+            File(
+                fileId = 1,
+                userId = userId,
+                path = filePath,
+                originalPath = "original_foobar.png",
+                status = FileStatus.UPLOADED,
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+                deletedAt = null,
+            )
+
+        `when`(getImagePathInContentUseCase.getImagePathInContent(content)).thenReturn(listOf(filePath))
+        `when`(readFilePort.readFileByPathAndUserId(filePath, userId)).thenReturn(file)
+
+        attachDiaryFileFromContentService.attachDiaryFileFromContent(
+            AttachDiaryFileFromContentCommand(userId, diaryId, content),
+        )
+
+        verify(readFilePort).readFileByPathAndUserId(filePath, userId)
+        verify(updateFilePort).updateFileStatus(file.fileId, FileStatus.USED)
+        verify(createDiaryFilePort).createDiaryFile(CreateDiaryFileDto(diaryId, file.fileId))
     }
 }
