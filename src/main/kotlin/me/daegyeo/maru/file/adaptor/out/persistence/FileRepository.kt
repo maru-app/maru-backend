@@ -20,5 +20,7 @@ interface FileRepository : JpaRepository<FileEntity, Long> {
         dateTime: ZonedDateTime,
     )
 
-    fun findByStatus(status: FileStatus): List<FileEntity>
+    fun findAllByStatusIn(status: Collection<FileStatus>): List<FileEntity>
+
+    fun deleteByStatusIn(statuses: Collection<FileStatus>)
 }

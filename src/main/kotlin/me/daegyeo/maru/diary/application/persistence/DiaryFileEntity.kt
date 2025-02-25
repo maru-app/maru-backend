@@ -1,14 +1,6 @@
 package me.daegyeo.maru.diary.application.persistence
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToOne
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import me.daegyeo.maru.file.application.persistence.FileEntity
 import me.daegyeo.maru.shared.entity.AuditDateTimeEntity
 
@@ -22,7 +14,7 @@ class DiaryFileEntity(
     @Column(name = "diary_id", nullable = false)
     val diaryId: Long,
 
-    @OneToOne(targetEntity = FileEntity::class)
+    @OneToOne(targetEntity = FileEntity::class, fetch = FetchType.LAZY)
     @JoinColumn(name = "file_id", nullable = false, insertable = false, updatable = false)
     val file: FileEntity? = null,
 

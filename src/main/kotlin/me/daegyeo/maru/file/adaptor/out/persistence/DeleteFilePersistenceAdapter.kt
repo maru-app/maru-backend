@@ -23,4 +23,10 @@ class DeleteFilePersistenceAdapter(private val fileRepository: FileRepository) :
         fileRepository.deleteByStatusAndCreatedAtBefore(status, dateTime)
         return true
     }
+
+    override fun deleteUploadedOrOrphanedFile(): Boolean {
+        val statuses = listOf(FileStatus.UPLOADED, FileStatus.ORPHANED)
+        fileRepository.deleteByStatusIn(statuses)
+        return true
+    }
 }

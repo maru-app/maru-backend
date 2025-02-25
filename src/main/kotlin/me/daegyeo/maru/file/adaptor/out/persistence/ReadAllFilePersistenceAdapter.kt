@@ -11,8 +11,8 @@ class ReadAllFilePersistenceAdapter(
     private val fileRepository: FileRepository,
     private val fileMapper: FileMapper,
 ) : ReadAllFilePort {
-    override fun readAllFileByStatus(status: FileStatus): List<File> {
-        val files = fileRepository.findByStatus(status)
+    override fun readAllFileByStatusIn(status: Collection<FileStatus>): List<File> {
+        val files = fileRepository.findAllByStatusIn(status)
         return files.map { fileMapper.toDomain(it) }
     }
 }
