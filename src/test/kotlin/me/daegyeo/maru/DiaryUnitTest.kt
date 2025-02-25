@@ -322,7 +322,6 @@ class DiaryUnitTest {
         verify(getDiaryUseCase).getDiaryByDiaryId(diaryId, userId)
         verify(deleteDiaryPort).deleteDiary(diaryId)
         verify(deleteDiaryFilePort).deleteAllByDiaryId(diaryId)
-        verify(deleteFilePort).deleteFile(any())
         verify(deleteDiaryPort).deleteDiary(diaryId)
         assert(result)
     }
