@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletResponse
 import me.daegyeo.maru.auth.adaptor.`in`.web.dto.RegisterUserDto
 import me.daegyeo.maru.auth.application.domain.AccessTokenPayload
+import me.daegyeo.maru.auth.application.domain.CustomUserDetails
 import me.daegyeo.maru.auth.application.port.`in`.GenerateJWTUseCase
 import me.daegyeo.maru.auth.application.port.`in`.GetAuthInfoUseCase
 import me.daegyeo.maru.auth.application.port.`in`.RegisterUserUseCase
@@ -11,6 +12,7 @@ import me.daegyeo.maru.auth.application.port.`in`.command.RegisterUserCommand
 import me.daegyeo.maru.auth.application.port.`in`.result.AuthInfoResult
 import me.daegyeo.maru.auth.constant.Auth
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -23,9 +25,9 @@ class AuthController(
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/me")
     fun getMyInfo(
-        @CookieValue(Auth.ACCESS_TOKEN_COOKIE) accessToken: String,
+        @AuthenticationPrincipal auth: CustomUserDetails,
     ): AuthInfoResult {
-        return getAuthInfoUseCase.getAuthInfo(accessToken)
+        return getAuthInfoUseCase.getAuthInfo(auth)
     }
 
     @PreAuthorize("permitAll()")
