@@ -20,6 +20,9 @@
             <pattern>${FILE_LOG_PATTERN}</pattern>
             <charset>utf8</charset>
         </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>log-%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>90</maxHistory>
@@ -27,11 +30,8 @@
         </rollingPolicy>
     </appender>
 
-    <root level="debug">
-        <appender-ref ref="STDOUT"/>
-    </root>
-
-    <root level="info">
+    <root level="INFO">
         <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
