@@ -18,7 +18,6 @@ class UpdateUserPersistence(private val userRepository: UserRepository, private 
         val user = userRepository.findById(userId).getOrNull()
         user?.let {
             if (inputUser.nickname != null) it.nickname = inputUser.nickname
-            if (inputUser.deletedAt != null) it.deletedAt = inputUser.deletedAt
             return userMapper.toDomain(userRepository.save(it))
         }
         return null
