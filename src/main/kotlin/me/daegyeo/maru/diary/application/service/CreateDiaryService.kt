@@ -9,6 +9,7 @@ import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
 import me.daegyeo.maru.diary.application.port.out.CreateDiaryPort
 import me.daegyeo.maru.diary.application.port.out.dto.CreateDiaryDto
 import me.daegyeo.maru.user.application.port.`in`.GetUserUseCase
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -20,6 +21,8 @@ class CreateDiaryService(
     private val attachDiaryFileFromContentUseCase: AttachDiaryFileFromContentUseCase,
 ) :
     CreateDiaryUseCase {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     @Transactional
     override fun createDiary(input: CreateDiaryCommand): Diary {
         val user = getUserUseCase.getUser(input.userId)
@@ -41,6 +44,8 @@ class CreateDiaryService(
                 content = input.content,
             ),
         )
+
+        logger.info("Diary 데이터를 생성했습니다. ${diary.diaryId}")
 
         return diary.let {
             it.content = ""

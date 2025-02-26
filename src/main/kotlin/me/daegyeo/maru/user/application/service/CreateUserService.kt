@@ -8,11 +8,14 @@ import me.daegyeo.maru.user.application.port.`in`.command.CreateUserUseCaseComma
 import me.daegyeo.maru.user.application.port.out.CreateUserPort
 import me.daegyeo.maru.user.application.port.out.ReadUserPort
 import me.daegyeo.maru.user.application.port.out.dto.CreateUserDto
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CreateUserService(private val createUserPort: CreateUserPort, private val readUserPort: ReadUserPort) : CreateUserUseCase {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     @Transactional
     override fun createUser(input: CreateUserUseCaseCommand): User {
         val existsUser = readUserPort.readUserByEmail(input.email)
@@ -28,6 +31,10 @@ class CreateUserService(private val createUserPort: CreateUserPort, private val 
                 nickname = input.nickname,
             )
 
-        return createUserPort.createUser(createUserDto)
+        val result = createUserPort.createUser(createUserDto)
+
+        logger.info("User 데이터를 생성했습니다. ${result.userId}")
+
+        return result
     }
 }

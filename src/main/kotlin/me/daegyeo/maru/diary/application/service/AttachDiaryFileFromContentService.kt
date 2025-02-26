@@ -8,6 +8,7 @@ import me.daegyeo.maru.diary.application.port.out.dto.CreateDiaryFileDto
 import me.daegyeo.maru.file.application.port.out.ReadFilePort
 import me.daegyeo.maru.file.application.port.out.UpdateFilePort
 import me.daegyeo.maru.file.constant.FileStatus
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
@@ -17,6 +18,8 @@ class AttachDiaryFileFromContentService(
     private val createDiaryFilePort: CreateDiaryFilePort,
     private val getImagePathInContentUseCase: GetImagePathInContentUseCase,
 ) : AttachDiaryFileFromContentUseCase {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     override fun attachDiaryFileFromContent(input: AttachDiaryFileFromContentCommand) {
         val imagePaths = getImagePathInContentUseCase.getImagePathInContent(input.content)
         imagePaths.forEach {
@@ -28,6 +31,10 @@ class AttachDiaryFileFromContentService(
                     fileId = file.fileId,
                 ),
             )
+        }
+
+        if (imagePaths.isNotEmpty()) {
+            logger.info("DiaryFile 데이터를 생성했습니다. diaryId: ${input.diaryId}")
         }
     }
 }

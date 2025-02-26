@@ -13,6 +13,7 @@ import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
 import me.daegyeo.maru.user.application.error.UserError
 import me.daegyeo.maru.user.application.port.`in`.GetUserUseCase
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken
@@ -29,6 +30,8 @@ class OAuthUserSuccessHandler(
 
     @Value("\${oauth.success-url}")
     private lateinit var successUrl: String
+
+    private val logger = LoggerFactory.getLogger(this::class.java)
 
     override fun onAuthenticationSuccess(
         request: HttpServletRequest?,
@@ -66,6 +69,8 @@ class OAuthUserSuccessHandler(
                 }
             response?.addCookie(tokenCookie)
             response?.sendRedirect(successUrl)
+
+            logger.info("소셜 로그인에 성공했습니다. $email")
         } catch (e: Exception) {
             if (e is ServiceException && e.error == UserError.USER_NOT_FOUND) {
                 val registerToken =
@@ -77,6 +82,8 @@ class OAuthUserSuccessHandler(
                     )
 
                 response?.sendRedirect("$redirectUrl?token=$registerToken")
+
+                logger.info("소셜 로그인으로 신규 가입을 진행했습니다. $email")
             } else {
                 throw e
             }

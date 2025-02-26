@@ -11,6 +11,7 @@ import me.daegyeo.maru.diary.application.port.out.ReadAllDiaryFilePort
 import me.daegyeo.maru.diary.application.port.out.UpdateDiaryPort
 import me.daegyeo.maru.file.application.port.out.UpdateFilePort
 import me.daegyeo.maru.file.constant.FileStatus
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -25,6 +26,8 @@ class UpdateDiaryService(
     private val encryptDiaryUseCase: EncryptDiaryUseCase,
     private val attachDiaryFileFromContentUseCase: AttachDiaryFileFromContentUseCase,
 ) : UpdateDiaryUseCase {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     @Transactional
     override fun updateDiary(
         diaryId: Long,
@@ -53,6 +56,9 @@ class UpdateDiaryService(
             title = input.title,
             content = encryptedContent,
         )
+
+        logger.info("Diary 데이터를 수정했습니다. diaryId: $diaryId")
+
         return true
     }
 }

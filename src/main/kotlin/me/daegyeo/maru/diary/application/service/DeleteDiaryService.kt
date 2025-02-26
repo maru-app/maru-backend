@@ -11,6 +11,7 @@ import me.daegyeo.maru.diary.application.port.out.ReadAllDiaryFilePort
 import me.daegyeo.maru.file.application.port.out.DeleteFilePort
 import me.daegyeo.maru.shared.error.CommonError
 import me.daegyeo.maru.shared.exception.ServiceException
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,10 +25,11 @@ class DeleteDiaryService(
     private val deleteDiaryFilePort: DeleteDiaryFilePort,
     private val deleteFilePort: DeleteFilePort,
     private val minioClient: MinioClient,
-) :
-    DeleteDiaryUseCase {
+) : DeleteDiaryUseCase {
     @Value("\${minio.bucket-name}")
     private lateinit var bucket: String
+
+    private val logger = LoggerFactory.getLogger(this::class.java)
 
     @Transactional
     override fun deleteDiary(
@@ -35,7 +37,7 @@ class DeleteDiaryService(
         userId: UUID,
     ): Boolean {
         val diary = getDiaryUseCase.getDiaryByDiaryId(diaryId, userId)
-        return diary.let {
+        diary.let {
             val deletedFiles = readAllDiaryFilePort.readAllDiaryFileByDiaryIdWithFile(it.diaryId)
             val deletedObjects = deletedFiles.map { diaryFile -> DeleteObject(diaryFile.file.path) }
 
@@ -50,10 +52,11 @@ class DeleteDiaryService(
                 try {
                     val error = result.get()
                     if (error != null) {
-                        // TODO: log error
+                        logger.error("Diary 데이터와 연결된 File 데이터 삭제 중 오류가 발생했습니다. ${error.message()}")
                         throw ServiceException(CommonError.INTERNAL_SERVER_ERROR)
                     }
                 } catch (e: Exception) {
+                    logger.error("Diary 데이터와 연결된 File 데이터 삭제 중 오류가 발생했습니다.")
                     e.printStackTrace()
                     throw ServiceException(CommonError.INTERNAL_SERVER_ERROR)
                 }
@@ -64,6 +67,9 @@ class DeleteDiaryService(
                 deleteFilePort.deleteFile(it.fileId)
             }
             deleteDiaryPort.deleteDiary(it.diaryId)
+
+            logger.info("Diary 데이터와 관련 파일을 삭제했습니다. ${it.diaryId}")
         }
+        return true
     }
 }

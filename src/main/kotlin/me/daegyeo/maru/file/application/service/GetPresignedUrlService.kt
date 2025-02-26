@@ -13,6 +13,7 @@ import me.daegyeo.maru.file.application.port.out.dto.CreateFileDto
 import me.daegyeo.maru.file.constant.FileStatus
 import me.daegyeo.maru.shared.error.CommonError
 import me.daegyeo.maru.shared.exception.ServiceException
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -31,6 +32,8 @@ class GetPresignedUrlService(
     @Value("\${minio.presigned-url-expiration}")
     private var urlExpirySeconds: Int = 0
 
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     @Transactional(readOnly = true)
     override fun getPresignedGetUrl(
         fileName: String,
@@ -41,6 +44,8 @@ class GetPresignedUrlService(
                 ?: throw ServiceException(FileError.FILE_NOT_FOUND)
 
         val presignedUrl = generatePresignedUrl(fileDomain.path, Method.GET)
+
+        logger.info("GET Presigned URL을 생성했습니다. $fileName")
 
         return PresignedUrl(
             url = presignedUrl,
@@ -66,6 +71,8 @@ class GetPresignedUrlService(
                 status = FileStatus.PENDING,
             ),
         )
+
+        logger.info("PUT Presigned URL을 생성했습니다. $fileName")
 
         return PresignedUrl(
             url = presignedUrl,
