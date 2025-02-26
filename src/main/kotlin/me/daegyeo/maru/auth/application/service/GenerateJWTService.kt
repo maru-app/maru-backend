@@ -6,6 +6,7 @@ import me.daegyeo.maru.auth.application.domain.AccessTokenPayload
 import me.daegyeo.maru.auth.application.domain.RegisterTokenPayload
 import me.daegyeo.maru.auth.application.port.`in`.GenerateJWTUseCase
 import me.daegyeo.maru.shared.util.DateFormat
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -25,6 +26,8 @@ class GenerateJWTService : GenerateJWTUseCase {
     @Value("\${jwt.register-token.expiration}")
     private lateinit var registerTokenExpiration: String
 
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     override fun generateAccessToken(payload: AccessTokenPayload): String {
         val token =
             Jwts.builder()
@@ -34,6 +37,7 @@ class GenerateJWTService : GenerateJWTUseCase {
                 .expiration(DateFormat.parseDurationToDate(accessTokenExpiration))
                 .signWith(Keys.hmacShaKeyFor(accessTokenSecret.toByteArray()))
                 .compact()
+        logger.info("Access Token을 생성했습니다. email: ${payload.email}")
         return token
     }
 
@@ -46,6 +50,7 @@ class GenerateJWTService : GenerateJWTUseCase {
                 .expiration(DateFormat.parseDurationToDate(registerTokenExpiration))
                 .signWith(Keys.hmacShaKeyFor(registerTokenSecret.toByteArray()))
                 .compact()
+        logger.info("Register Token을 생성했습니다. email: ${payload.email}")
         return token
     }
 }

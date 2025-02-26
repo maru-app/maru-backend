@@ -19,7 +19,7 @@ class DiaryEntity(
     @Column(columnDefinition = "TEXT", nullable = false)
     var content: String,
 
-    @ManyToOne(targetEntity = UserEntity::class)
+    @ManyToOne(targetEntity = UserEntity::class, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
     val user: UserEntity? = null,
 

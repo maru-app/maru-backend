@@ -5,6 +5,7 @@ import io.minio.RemoveObjectArgs
 import me.daegyeo.maru.file.application.port.out.DeleteFilePort
 import me.daegyeo.maru.file.application.port.out.ReadAllFilePort
 import me.daegyeo.maru.file.constant.FileStatus
+import org.slf4j.LoggerFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobParametersBuilder
 import org.springframework.batch.core.Step
@@ -32,6 +33,8 @@ class CleanUpFileObjectsBatch(
     @Value("\${minio.bucket-name}")
     private lateinit var bucket: String
 
+    private val logger = LoggerFactory.getLogger(CleanUpFileObjectsBatch::class.java)
+
     fun cleanUpFileObjectsTasklet(): Tasklet {
         return Tasklet { _, _ ->
             val orphanedFiles = readAllFilePort.readAllFileByStatusIn(listOf(FileStatus.UPLOADED, FileStatus.ORPHANED))
@@ -45,6 +48,8 @@ class CleanUpFileObjectsBatch(
             }
 
             deleteFilePort.deleteUploadedOrOrphanedFile()
+
+            logger.info("사용되지 않는 파일 데이터를 삭제했습니다.")
 
             RepeatStatus.FINISHED
         }
