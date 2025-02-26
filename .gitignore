@@ -45,3 +45,5 @@ out/
 
 # Docker Data
 /minio/
+
+/logs/
