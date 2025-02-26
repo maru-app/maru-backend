@@ -11,7 +11,6 @@ import me.daegyeo.maru.auth.application.service.*
 import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
 import me.daegyeo.maru.user.application.port.`in`.CreateUserUseCase
-import me.daegyeo.maru.user.application.port.`in`.GetUserUseCase
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -37,8 +36,6 @@ class AuthUnitTest {
     private val parseJWTService = ParseJWTService()
     private val validateJWTService = ValidateJWTService()
     private val generateJWTService = GenerateJWTService()
-    private val getUserUseCase = mock(GetUserUseCase::class.java)
-    private val parseJWTUseCase = mock(ParseJWTUseCase::class.java)
     private val getAuthInfoService = GetAuthInfoService()
 
     @BeforeEach
