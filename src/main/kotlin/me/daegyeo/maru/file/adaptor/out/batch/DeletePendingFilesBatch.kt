@@ -2,6 +2,7 @@ package me.daegyeo.maru.file.adaptor.out.batch
 
 import me.daegyeo.maru.file.application.port.out.DeleteFilePort
 import me.daegyeo.maru.file.constant.FileStatus
+import org.slf4j.LoggerFactory
 import org.springframework.batch.core.Job
 import org.springframework.batch.core.JobParametersBuilder
 import org.springframework.batch.core.Step
@@ -24,10 +25,13 @@ class DeletePendingFilesBatch(
     private val jobRepository: JobRepository,
     private val jobLauncher: JobLauncher,
 ) {
+    private val logger = LoggerFactory.getLogger(DeletePendingFilesBatch::class.java)
+
     fun deletePendingFilesTasklet(): Tasklet {
         return Tasklet { _, _ ->
             val oneHourAgo = ZonedDateTime.now().minusHours(1)
             deleteFilePort.deleteFileByStatusAndCreatedAtBefore(FileStatus.PENDING, oneHourAgo)
+            logger.info("PENDING 상태의 파일 데이터를 삭제했습니다.")
             RepeatStatus.FINISHED
         }
     }
