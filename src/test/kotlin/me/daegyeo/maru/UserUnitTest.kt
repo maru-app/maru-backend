@@ -1,5 +1,8 @@
 package me.daegyeo.maru
 
+import me.daegyeo.maru.diary.application.domain.Diary
+import me.daegyeo.maru.diary.application.port.`in`.DeleteDiaryUseCase
+import me.daegyeo.maru.diary.application.port.`in`.GetAllDiaryUseCase
 import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
 import me.daegyeo.maru.user.application.domain.User
@@ -7,11 +10,13 @@ import me.daegyeo.maru.user.application.error.UserError
 import me.daegyeo.maru.user.application.port.`in`.command.CreateUserUseCaseCommand
 import me.daegyeo.maru.user.application.port.`in`.command.UpdateUserUseCaseCommand
 import me.daegyeo.maru.user.application.port.out.CreateUserPort
+import me.daegyeo.maru.user.application.port.out.DeleteUserPort
 import me.daegyeo.maru.user.application.port.out.ReadUserPort
 import me.daegyeo.maru.user.application.port.out.UpdateUserPort
 import me.daegyeo.maru.user.application.port.out.dto.CreateUserDto
 import me.daegyeo.maru.user.application.port.out.dto.UpdateUserDto
 import me.daegyeo.maru.user.application.service.CreateUserService
+import me.daegyeo.maru.user.application.service.DeleteUserService
 import me.daegyeo.maru.user.application.service.GetUserService
 import me.daegyeo.maru.user.application.service.UpdateUserService
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -27,10 +32,15 @@ import java.util.UUID
 class UserUnitTest {
     private val createUserPort = mock(CreateUserPort::class.java)
     private val readUserPort = mock(ReadUserPort::class.java)
+    private val deleteUserPort = mock(DeleteUserPort::class.java)
     private val updatedUserPort = mock(UpdateUserPort::class.java)
+    private val getUserUseCase = mock(GetUserService::class.java)
+    private val getAllDiaryUseCase = mock(GetAllDiaryUseCase::class.java)
+    private val deleteDiaryUseCase = mock(DeleteDiaryUseCase::class.java)
     private val createUserService = CreateUserService(createUserPort, readUserPort)
     private val getUserService = GetUserService(readUserPort)
     private val updateUserService = UpdateUserService(updatedUserPort)
+    private val deleteUserService = DeleteUserService(deleteUserPort, getUserUseCase, getAllDiaryUseCase, deleteDiaryUseCase)
 
     @Test
     fun `이미 존재하는 이메일로 회원가입 시 오류를 반환함`() {
@@ -147,12 +157,12 @@ class UserUnitTest {
 
     @Test
     fun `사용자 정보를 성공적으로 수정함`() {
-        val input = UpdateUserUseCaseCommand(nickname = "NewNickname", deletedAt = null)
+        val input = UpdateUserUseCaseCommand(nickname = "NewNickname")
         val userId = UUID.randomUUID()
         `when`(
             updatedUserPort.updateUser(
                 userId,
-                UpdateUserDto(nickname = "NewNickname", deletedAt = null),
+                UpdateUserDto(nickname = "NewNickname"),
             ),
         ).thenReturn(
             User(
@@ -168,18 +178,18 @@ class UserUnitTest {
 
         val result = updateUserService.updateUser(userId, input)
 
-        verify(updatedUserPort).updateUser(userId, UpdateUserDto(nickname = "NewNickname", deletedAt = null))
+        verify(updatedUserPort).updateUser(userId, UpdateUserDto(nickname = "NewNickname"))
         assert(result.nickname == "NewNickname")
     }
 
     @Test
     fun `존재하지 않는 사용자 정보를 수정하면 오류를 반환함`() {
-        val input = UpdateUserUseCaseCommand(nickname = "NewNickname", deletedAt = null)
+        val input = UpdateUserUseCaseCommand(nickname = "NewNickname")
         val userId = UUID.randomUUID()
         `when`(
             updatedUserPort.updateUser(
                 userId,
-                UpdateUserDto(nickname = "NewNickname", deletedAt = null),
+                UpdateUserDto(nickname = "NewNickname"),
             ),
         ).thenReturn(null)
 
@@ -192,7 +202,36 @@ class UserUnitTest {
 
     @Test
     fun `사용자가 성공적으로 탈퇴함`() {
-        // TODO: Not implemented yet
+        val userId = UUID.randomUUID()
+        val user =
+            User(
+                userId = userId,
+                email = "foobar@acme.com",
+                vendor = Vendor.GOOGLE,
+                nickname = "FooBar",
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+                deletedAt = null,
+            )
+        val diaries =
+            listOf(
+                Diary(
+                    diaryId = 1L,
+                    title = "제목",
+                    content = "ENCRYPTED_CONTENT",
+                    createdAt = ZonedDateTime.now(),
+                    updatedAt = ZonedDateTime.now(),
+                    deletedAt = null,
+                ),
+            )
+
+        `when`(getUserUseCase.getUser(userId)).thenReturn(user)
+        `when`(getAllDiaryUseCase.getAllDiaryByUserId(userId)).thenReturn(diaries)
+
+        deleteUserService.deleteUser(userId)
+
+        verify(deleteDiaryUseCase).deleteDiary(1L, userId)
+        verify(deleteUserPort).deleteUser(userId)
     }
 
     @Test

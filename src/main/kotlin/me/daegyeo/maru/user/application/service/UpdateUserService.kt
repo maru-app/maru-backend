@@ -19,8 +19,10 @@ class UpdateUserService(private val updateUserPort: UpdateUserPort) : UpdateUser
         userId: UUID,
         input: UpdateUserUseCaseCommand,
     ): User {
+        val result =
+            updateUserPort.updateUser(userId, UpdateUserDto(nickname = input.nickname))
+                ?: throw ServiceException(UserError.USER_NOT_FOUND)
         logger.info("User 데이터를 변경했습니다. $userId")
-        return updateUserPort.updateUser(userId, UpdateUserDto(nickname = input.nickname, deletedAt = input.deletedAt))
-            ?: throw ServiceException(UserError.USER_NOT_FOUND)
+        return result
     }
 }
