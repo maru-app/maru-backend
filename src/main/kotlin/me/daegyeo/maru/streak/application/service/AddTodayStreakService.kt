@@ -23,11 +23,16 @@ class AddTodayStreakService(
         val streak =
             latest?.let {
                 val today = ZonedDateTime.now()
+                val isSameDate = it.createdAt.toLocalDate() == today.toLocalDate()
                 val isInARow = it.createdAt.toLocalDate().plusDays(1) == today.toLocalDate()
-                if (isInARow) {
-                    it.streak + 1
+                if (isSameDate) {
+                    it.streak
                 } else {
-                    1
+                    if (isInARow) {
+                        it.streak + 1
+                    } else {
+                        1
+                    }
                 }
             } ?: 1
         val bestStreak =
