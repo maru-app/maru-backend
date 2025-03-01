@@ -20,8 +20,8 @@ class CreateStreakPersistenceAdapter(
                 bestStreak = input.bestStreak,
             )
 
-        return streakRepository.save(streak).let {
-            streakMapper.toDomain(it)
-        }
+        val saved = streakRepository.save(streak)
+
+        return streakMapper.toDomain(saved)
     }
 }

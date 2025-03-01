@@ -7,6 +7,8 @@ import me.daegyeo.maru.streak.application.port.out.ReadStreakPort
 import me.daegyeo.maru.streak.application.port.out.dto.CreateStreakDto
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
 import java.time.ZonedDateTime
 import java.util.UUID
 import kotlin.math.max
@@ -18,6 +20,7 @@ class AddTodayStreakService(
 ) : AddTodayStreakUseCase {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     override fun addTodayStreak(userId: UUID): Streak {
         val latest = readStreakPort.readLatestStreakByUserId(userId)
         val streak =
