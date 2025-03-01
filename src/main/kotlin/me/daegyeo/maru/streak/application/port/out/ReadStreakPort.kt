@@ -4,7 +4,7 @@ import me.daegyeo.maru.streak.application.domain.Streak
 import java.time.ZonedDateTime
 import java.util.UUID
 
-fun interface ReadStreakPort {
+interface ReadStreakPort {
     fun readLatestStreakByUserId(userId: UUID): Streak?
 
     fun readLatestStreakByUserIdAndCreatedAt(

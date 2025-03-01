@@ -31,6 +31,15 @@ interface StreakRepository : JpaRepository<StreakEntity, Long> {
         year: String,
     ): List<StreakGroupByDate>
 
+    @Query(
+        """
+       SELECT s FROM StreakEntity s 
+        WHERE s.userId = :userId AND 
+            FUNCTION('DATE', s.createdAt) = FUNCTION('DATE', :createdAt) 
+        ORDER BY s.createdAt DESC
+        LIMIT 1
+    """,
+    )
     fun findFirstByUserIdAndCreatedAtOrderByCreatedAtDesc(
         userId: UUID,
         createdAt: ZonedDateTime,
