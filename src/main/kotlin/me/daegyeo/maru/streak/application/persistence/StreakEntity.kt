@@ -14,7 +14,7 @@ class StreakEntity(
     @Column(nullable = false, name = "best_streak")
     var bestStreak: Int,
 
-    @ManyToOne(targetEntity = UserEntity::class)
+    @ManyToOne(targetEntity = UserEntity::class, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)
     val user: UserEntity? = null,
 
