@@ -4,6 +4,7 @@ import me.daegyeo.maru.streak.application.domain.StreakGroupByDate
 import me.daegyeo.maru.streak.application.persistence.StreakEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import java.time.ZonedDateTime
 import java.util.Optional
 import java.util.UUID
 
@@ -29,4 +30,9 @@ interface StreakRepository : JpaRepository<StreakEntity, Long> {
         userId: UUID,
         year: String,
     ): List<StreakGroupByDate>
+
+    fun findFirstByUserIdAndCreatedAtOrderByCreatedAtDesc(
+        userId: UUID,
+        createdAt: ZonedDateTime,
+    ): Optional<StreakEntity>
 }
