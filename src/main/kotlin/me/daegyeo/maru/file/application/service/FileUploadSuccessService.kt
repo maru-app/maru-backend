@@ -21,8 +21,11 @@ class FileUploadSuccessService(
     override fun fileUploadSuccess(fileKey: String): Boolean {
         val path = fileKey.split("/").last()
         val file = readFilePort.readFileByPath(path) ?: throw ServiceException(FileError.FILE_NOT_FOUND)
-        updateFilePort.updateFileStatus(file.fileId, FileStatus.UPLOADED)
-        logger.info("File 데이터를 UPLAODED 상태로 변경했습니다. ${file.fileId}")
+        val isAlreadyFileUsedInDiary = file.status != FileStatus.USED
+        if (isAlreadyFileUsedInDiary) {
+            updateFilePort.updateFileStatus(file.fileId, FileStatus.UPLOADED)
+            logger.info("File 데이터를 UPLOADED 상태로 변경했습니다. ${file.fileId}")
+        }
         return true
     }
 }
