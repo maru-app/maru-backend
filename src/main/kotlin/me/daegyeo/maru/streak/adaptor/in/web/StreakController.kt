@@ -3,7 +3,8 @@ package me.daegyeo.maru.streak.adaptor.`in`.web
 import me.daegyeo.maru.auth.application.domain.CustomUserDetails
 import me.daegyeo.maru.streak.application.domain.StreakGroupByDate
 import me.daegyeo.maru.streak.application.port.`in`.GetAllStreakUseCase
-import me.daegyeo.maru.streak.application.port.`in`.GetBestStreakUseCase
+import me.daegyeo.maru.streak.application.port.`in`.GetStreakUseCase
+import me.daegyeo.maru.streak.application.port.`in`.result.GetStreakResult
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,7 +19,7 @@ import java.time.format.DateTimeFormatter
 @RequestMapping("/streak")
 class StreakController(
     private val getAllStreakUseCase: GetAllStreakUseCase,
-    private val getBestStreakUseCase: GetBestStreakUseCase,
+    private val getStreakUseCase: GetStreakUseCase,
 ) {
     @PreAuthorize("hasRole('USER')")
     @GetMapping
@@ -34,12 +35,12 @@ class StreakController(
     fun getBestStreak(
         @RequestParam("date") date: String,
         @AuthenticationPrincipal auth: CustomUserDetails,
-    ): Int {
+    ): GetStreakResult {
         val zonedDateTime =
             LocalDate
                 .parse(date, DateTimeFormatter.ISO_LOCAL_DATE)
                 .atStartOfDay()
                 .atZone(ZoneId.systemDefault())
-        return getBestStreakUseCase.getBestStreakByDate(auth.userId, zonedDateTime)
+        return getStreakUseCase.getStreak(auth.userId, zonedDateTime)
     }
 }
