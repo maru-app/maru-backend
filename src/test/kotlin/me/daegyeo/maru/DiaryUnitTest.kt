@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.*
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import org.springframework.context.ApplicationEventPublisher
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -55,12 +56,15 @@ class DiaryUnitTest {
     private val getImagePathInContentUseCase = mock(GetImagePathInContentUseCase::class.java)
     private val attachDiaryFileFromContentUseCase = mock(AttachDiaryFileFromContentUseCase::class.java)
 
+    private val applicationEventPublisher = mock(ApplicationEventPublisher::class.java)
+
     private val createDiaryService =
         CreateDiaryService(
             getUserUseCase,
             createDiaryPort,
             encryptDiaryUseCase,
             attachDiaryFileFromContentUseCase,
+            applicationEventPublisher,
         )
     private val getAllDiaryService = GetAllDiaryService(readAllDiaryPort)
     private val getDiaryService = GetDiaryService(readDiaryPort, decryptDiaryUseCase)
