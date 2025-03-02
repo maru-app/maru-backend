@@ -19,7 +19,7 @@ class GetStreakService(
         val latestStreak = readStreakPort.readLatestStreakByUserId(userId)
         return GetStreakResult(
             streak = streak?.streak ?: 0,
-            bestStreak = latestStreak?.streak ?: 0,
+            bestStreak = latestStreak?.bestStreak ?: 0,
         )
     }
 }
