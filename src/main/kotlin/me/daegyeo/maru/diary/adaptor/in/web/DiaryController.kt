@@ -7,6 +7,7 @@ import me.daegyeo.maru.diary.application.domain.Diary
 import me.daegyeo.maru.diary.application.port.`in`.*
 import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
 import me.daegyeo.maru.diary.application.port.`in`.command.UpdateDiaryCommand
+import org.springframework.data.domain.Page
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -39,8 +40,10 @@ class DiaryController(
     @GetMapping
     fun getAllDiary(
         @AuthenticationPrincipal auth: CustomUserDetails,
-    ): List<Diary> {
-        return getAllDiaryUseCase.getAllDiaryByUserId(auth.userId)
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int,
+    ): Page<Diary> {
+        return getAllDiaryUseCase.getAllDiaryByUserIdWithPagination(auth.userId, page, size)
     }
 
     @PreAuthorize("hasRole('USER')")
