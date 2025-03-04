@@ -4,9 +4,12 @@ import io.jsonwebtoken.*
 import me.daegyeo.maru.auth.application.domain.AccessTokenPayload
 import me.daegyeo.maru.auth.application.domain.CustomUserDetails
 import me.daegyeo.maru.auth.application.domain.RegisterTokenPayload
+import me.daegyeo.maru.auth.application.domain.TokenBlacklist
 import me.daegyeo.maru.auth.application.error.AuthError
 import me.daegyeo.maru.auth.application.port.`in`.ParseJWTUseCase
 import me.daegyeo.maru.auth.application.port.`in`.command.RegisterUserCommand
+import me.daegyeo.maru.auth.application.port.out.CreateTokenBlacklistPort
+import me.daegyeo.maru.auth.application.port.out.ReadTokenBlacklistPort
 import me.daegyeo.maru.auth.application.service.*
 import me.daegyeo.maru.shared.constant.Vendor
 import me.daegyeo.maru.shared.exception.ServiceException
@@ -33,10 +36,15 @@ class AuthUnitTest {
     private val jwtParser = mock(JwtParser::class.java)
     private val jws: Jws<Claims> = mock(Jws::class.java) as Jws<Claims>
     private val createUserUseCase = mock(CreateUserUseCase::class.java)
+    private val createTokenBlacklistPort = mock(CreateTokenBlacklistPort::class.java)
+    private val readTokenBlacklistPort = mock(ReadTokenBlacklistPort::class.java)
+
     private val parseJWTService = ParseJWTService()
     private val validateJWTService = ValidateJWTService()
     private val generateJWTService = GenerateJWTService()
     private val getAuthInfoService = GetAuthInfoService()
+    private val addTokenToBlacklistService = AddTokenToBlacklistService(createTokenBlacklistPort)
+    private val isExistsTokenInBlacklistService = IsExistsTokenInBlacklistService(readTokenBlacklistPort)
 
     @BeforeEach
     fun setup() {
@@ -190,5 +198,43 @@ class AuthUnitTest {
         assert(nickname == result.nickname)
         assert(vendor == result.vendor)
         assert(createdAt == result.createdAt)
+    }
+
+    @Test
+    fun `AccessToken을 블랙리스트에 추가함`() {
+        val accessToken = "TOKEN"
+
+        addTokenToBlacklistService.addTokenToBlacklist(accessToken)
+
+        verify(createTokenBlacklistPort).createTokenBlacklist(accessToken)
+    }
+
+    @Test
+    fun `AccessToken이 블랙리스트에 존재하는지 확인함`() {
+        val accessToken = "TOKEN"
+
+        `when`(readTokenBlacklistPort.findByToken(accessToken)).thenReturn(
+            TokenBlacklist(
+                tokenBlacklistId = 1L,
+                token = accessToken,
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+            ),
+        )
+
+        val result = isExistsTokenInBlacklistService.isExistsTokenInBlacklist(accessToken)
+
+        assert(result)
+    }
+
+    @Test
+    fun `AccessToken이 블랙리스트에 존재하지 않음`() {
+        val accessToken = "TOKEN"
+
+        `when`(readTokenBlacklistPort.findByToken(accessToken)).thenReturn(null)
+
+        val result = isExistsTokenInBlacklistService.isExistsTokenInBlacklist(accessToken)
+
+        assert(!result)
     }
 }
