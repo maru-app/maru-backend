@@ -10,6 +10,8 @@ spring:
         url: ${DATABASE_URL}
         username: ${DATABASE_USERNAME}
         password: ${DATABASE_PASSWORD}
+    flyway:
+        enabled: true
     jpa:
         hibernate:
             ddl-auto: validate
@@ -42,7 +44,7 @@ spring:
                         user-name-attribute: response
     batch:
         jdbc:
-            initialize-schema: always
+            initialize-schema: never
 oauth:
     redirect-url: ${OAUTH_REDIRECT_URL}
     success-url: ${OAUTH_SUCCESS_URL}
