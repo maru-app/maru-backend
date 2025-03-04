@@ -1,10 +1,12 @@
 package me.daegyeo.maru.auth.adapter.`in`.web
 
 import jakarta.servlet.http.Cookie
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import me.daegyeo.maru.auth.adapter.`in`.web.dto.RegisterUserDto
 import me.daegyeo.maru.auth.application.domain.AccessTokenPayload
 import me.daegyeo.maru.auth.application.domain.CustomUserDetails
+import me.daegyeo.maru.auth.application.port.`in`.AddTokenToBlacklistUseCase
 import me.daegyeo.maru.auth.application.port.`in`.GenerateJWTUseCase
 import me.daegyeo.maru.auth.application.port.`in`.GetAuthInfoUseCase
 import me.daegyeo.maru.auth.application.port.`in`.RegisterUserUseCase
@@ -21,6 +23,7 @@ class AuthController(
     private val registerUserUseCase: RegisterUserUseCase,
     private val getAuthInfoUseCase: GetAuthInfoUseCase,
     private val generateJWTUseCase: GenerateJWTUseCase,
+    private val addTokenToBlacklistUseCase: AddTokenToBlacklistUseCase,
 ) {
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/me")
@@ -62,14 +65,22 @@ class AuthController(
 
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/logout")
-    fun logout(response: HttpServletResponse): Boolean {
+    fun logout(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ): Boolean {
+        val accessToken = request.cookies?.find { it.name == Auth.ACCESS_TOKEN_COOKIE }?.value
+        if (accessToken != null) {
+            addTokenToBlacklistUseCase.addTokenToBlacklist(accessToken)
+        }
+
         response.addCookie(
             Cookie(Auth.ACCESS_TOKEN_COOKIE, null).apply {
                 maxAge = 0
                 isHttpOnly = true
             },
         )
-        // TODO: Add the deleted access token in blacklist database.
+
         return true
     }
 }

@@ -2,6 +2,7 @@ package me.daegyeo.maru.infrastructure.config
 
 import me.daegyeo.maru.auth.application.error.AuthError
 import me.daegyeo.maru.auth.application.port.`in`.CustomUserDetailsUseCase
+import me.daegyeo.maru.auth.application.port.`in`.IsExistsTokenInBlacklistUseCase
 import me.daegyeo.maru.auth.application.port.`in`.OAuthUserSuccessUseCase
 import me.daegyeo.maru.auth.application.port.`in`.ParseJWTUseCase
 import me.daegyeo.maru.infrastructure.filter.ExceptionHandleFilter
@@ -23,6 +24,7 @@ class SecurityConfig(
     private val oAuthUserSuccessUseCase: OAuthUserSuccessUseCase,
     private val parseJWTUseCase: ParseJWTUseCase,
     private val customUserDetailsUseCase: CustomUserDetailsUseCase,
+    private val isExistsTokenInBlacklistUseCase: IsExistsTokenInBlacklistUseCase,
 ) {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -56,7 +58,7 @@ class SecurityConfig(
                 UsernamePasswordAuthenticationFilter::class.java,
             )
             .addFilterBefore(
-                JwtAuthenticationFilter(parseJWTUseCase, customUserDetailsUseCase),
+                JwtAuthenticationFilter(parseJWTUseCase, customUserDetailsUseCase, isExistsTokenInBlacklistUseCase),
                 UsernamePasswordAuthenticationFilter::class.java,
             )
 
