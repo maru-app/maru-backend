@@ -10,7 +10,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "diaries")
-@SQLDelete(sql = "UPDATE diaries SET deleted_at = now() WHERE diary_id = ?")
+@SQLDelete(sql = "UPDATE diaries SET deleted_at = now(), content = '' WHERE diary_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 class DiaryEntity(
     @Column(columnDefinition = "TEXT", nullable = false)

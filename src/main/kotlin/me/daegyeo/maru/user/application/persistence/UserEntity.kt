@@ -6,14 +6,14 @@ import me.daegyeo.maru.shared.entity.AuditDateTimeEntity
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.UUID
 
 @Entity
 @Table(name = "users")
-@SQLDelete(sql = "UPDATE users SET deleted_at = now() WHERE user_id = ?")
+@SQLDelete(sql = "UPDATE users SET deleted_at = now(), email = '<deleted-account>@maruu.space' WHERE user_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 class UserEntity(
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     val email: String,
 
     @Column(nullable = false)
