@@ -22,7 +22,7 @@ repositories {
 
 val jjwtVersion = "0.12.6"
 val mockitoVersion = "5.4.0"
-val minioVersion = "8.5.7"
+val minioVersion = "8.5.17"
 val flywayVerson = "9.22.3"
 
 dependencies {
