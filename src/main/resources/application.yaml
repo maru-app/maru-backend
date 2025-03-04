@@ -1,6 +1,8 @@
 server:
     port: ${PORT:8080}
 spring:
+    profiles:
+        default: prod
     application:
         name: maru-backend
     datasource:
@@ -14,7 +16,6 @@ spring:
         properties:
             hibernate:
                 dialect: org.hibernate.dialect.PostgreSQLDialect
-                show_sql: false
     security:
         oauth2:
             client:
