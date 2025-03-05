@@ -1,6 +1,6 @@
 server:
     port: ${PORT:8080}
-    forward-headers-strategy: NATIVE
+    forward-headers-strategy: FRAMEWORK
     tomcat:
         remoteip:
             protocol-header: X-Forwarded-Proto
