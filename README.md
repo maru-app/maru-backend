@@ -4,6 +4,10 @@
 ## 환경변수
 ```dotenv
 PORT=8080
+# Frontend domain (without schema, trailing slash)
+DOMAIN=acme.com
+# Backend domain
+API_DOMIAN=api.acme.com
 
 DATABASE_URL=jdbc:postgresql://localhost:5432/database
 DATABASE_USERNAME=
@@ -27,6 +31,7 @@ NAVER_SECRET=
 
 DIARY_SECRET=
 
+# Separate by comma
 CORS_ORIGINS=http://localhost:3000,http://frontend
 
 MINIO_ENDPOINT=
