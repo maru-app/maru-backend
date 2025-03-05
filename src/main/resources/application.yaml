@@ -5,6 +5,7 @@ server:
         remoteip:
             protocol-header: X-Forwarded-Proto
             remote-ip-header: X-Forwarded-For
+            trusted-proxies: ${TRUSTED_PROXIES}
 spring:
     profiles:
         default: prod
