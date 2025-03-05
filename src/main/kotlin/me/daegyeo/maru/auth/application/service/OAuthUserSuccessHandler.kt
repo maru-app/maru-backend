@@ -32,7 +32,7 @@ class OAuthUserSuccessHandler(
     private lateinit var successUrl: String
 
     @Value("\${domain}")
-    private lateinit var domain: String
+    private lateinit var domainEnv: String
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -49,7 +49,7 @@ class OAuthUserSuccessHandler(
         val email =
             when (vendor) {
                 Vendor.GOOGLE.name.lowercase() -> userAttributes["email"] as String
-                Vendor.NAVER.name.lowercase() -> (userAttributes["response"] as Map<String, String>)["email"] as String
+                Vendor.NAVER.name.lowercase() -> (userAttributes["response"] as Map<*, *>)["email"] as String
                 else -> throw ServiceException(AuthError.PERMISSION_DENIED)
             }
 
@@ -69,7 +69,7 @@ class OAuthUserSuccessHandler(
                     isHttpOnly = true
                     secure = true
                     maxAge = (60 * 60 * 24 * 7)
-                    this.domain = domain
+                    domain = domainEnv
                 }
             response?.addCookie(tokenCookie)
             response?.sendRedirect(successUrl)
