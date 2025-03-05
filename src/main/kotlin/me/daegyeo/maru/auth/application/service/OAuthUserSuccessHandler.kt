@@ -31,6 +31,9 @@ class OAuthUserSuccessHandler(
     @Value("\${oauth.success-url}")
     private lateinit var successUrl: String
 
+    @Value("\${domain}")
+    private lateinit var domain: String
+
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     override fun onAuthenticationSuccess(
@@ -66,6 +69,7 @@ class OAuthUserSuccessHandler(
                     isHttpOnly = true
                     secure = true
                     maxAge = (60 * 60 * 24 * 7)
+                    this.domain = domain
                 }
             response?.addCookie(tokenCookie)
             response?.sendRedirect(successUrl)

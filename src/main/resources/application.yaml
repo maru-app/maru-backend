@@ -65,3 +65,4 @@ minio:
     secret-key: ${MINIO_SECRET_KEY}
     bucket-name: ${MINIO_BUCKET_NAME}
     presigned-url-expiration: ${MINIO_PRESIGNED_URL_EXPIRATION}
+domain: ${DOMAIN}
