@@ -17,6 +17,11 @@ class HttpLoggingFilter : OncePerRequestFilter() {
         filterChain: FilterChain,
     ) {
         filterChain.doFilter(request, response)
-        log.info("[${request.method}] ${request.remoteAddr} ${request.requestURI} (${request.contentType}) - ${response.status}")
+
+        val forwardedIp = request.getHeader("X-Forwarded-For")
+        val ip = forwardedIp ?: request.remoteAddr
+        log.info(
+            "[${request.method}] $ip ${request.requestURI} (${request.contentType}) - ${response.status}",
+        )
     }
 }
