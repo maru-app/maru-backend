@@ -70,6 +70,7 @@ class OAuthUserSuccessHandler(
                     secure = true
                     maxAge = (60 * 60 * 24 * 7)
                     domain = domainEnv
+                    setAttribute("SameSite", "Lax")
                 }
             response?.addCookie(tokenCookie)
             response?.sendRedirect(successUrl)

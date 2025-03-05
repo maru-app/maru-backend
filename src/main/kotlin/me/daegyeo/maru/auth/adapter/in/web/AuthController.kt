@@ -13,6 +13,7 @@ import me.daegyeo.maru.auth.application.port.`in`.RegisterUserUseCase
 import me.daegyeo.maru.auth.application.port.`in`.command.RegisterUserCommand
 import me.daegyeo.maru.auth.application.port.`in`.result.AuthInfoResult
 import me.daegyeo.maru.auth.constant.Auth
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -25,6 +26,9 @@ class AuthController(
     private val generateJWTUseCase: GenerateJWTUseCase,
     private val addTokenToBlacklistUseCase: AddTokenToBlacklistUseCase,
 ) {
+    @Value("\${domain}")
+    private lateinit var domainEnv: String
+
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/me")
     fun getMyInfo(
@@ -57,6 +61,8 @@ class AuthController(
                 isHttpOnly = true
                 secure = true
                 maxAge = (60 * 60 * 24 * 7)
+                domain = domainEnv
+                setAttribute("SameSite", "Lax")
             },
         )
 
