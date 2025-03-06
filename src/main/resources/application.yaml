@@ -1,11 +1,6 @@
 server:
     port: ${PORT:8080}
-    forward-headers-strategy: FRAMEWORK
-    tomcat:
-        remoteip:
-            protocol-header: X-Forwarded-Proto
-            remote-ip-header: X-Forwarded-For
-            trusted-proxies: ${TRUSTED_PROXIES}
+    forward-headers-strategy: framework
 spring:
     profiles:
         default: prod
@@ -73,3 +68,6 @@ minio:
     bucket-name: ${MINIO_BUCKET_NAME}
     presigned-url-expiration: ${MINIO_PRESIGNED_URL_EXPIRATION}
 domain: ${DOMAIN}
+sentry:
+    dsn: ${SENTRY_DSN}
+    send-default-pii: true
