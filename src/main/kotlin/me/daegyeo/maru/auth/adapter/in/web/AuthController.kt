@@ -82,8 +82,12 @@ class AuthController(
 
         response.addCookie(
             Cookie(Auth.ACCESS_TOKEN_COOKIE, null).apply {
+                path = "/"
                 maxAge = 0
                 isHttpOnly = true
+                secure = true
+                domain = domainEnv
+                setAttribute("SameSite", "Lax")
             },
         )
 
