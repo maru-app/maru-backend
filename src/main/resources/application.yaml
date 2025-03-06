@@ -1,11 +1,6 @@
 server:
     port: ${PORT:8080}
-    forward-headers-strategy: FRAMEWORK
-    tomcat:
-        remoteip:
-            protocol-header: X-Forwarded-Proto
-            remote-ip-header: X-Forwarded-For
-            trusted-proxies: ${TRUSTED_PROXIES}
+    forward-headers-strategy: framework
 spring:
     profiles:
         default: prod
