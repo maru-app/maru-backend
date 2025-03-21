@@ -40,7 +40,7 @@ class StreakController(
             LocalDate
                 .parse(date, DateTimeFormatter.ISO_LOCAL_DATE)
                 .atStartOfDay()
-                .atZone(ZoneId.of("UTC"))
+                .atZone(ZoneId.systemDefault())
         return getStreakUseCase.getStreak(auth.userId, zonedDateTime)
     }
 }
