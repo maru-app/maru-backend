@@ -3,6 +3,7 @@ package me.daegyeo.maru.streak.adapter.out.persistence
 import me.daegyeo.maru.streak.adapter.out.mapper.StreakMapper
 import me.daegyeo.maru.streak.application.domain.Streak
 import me.daegyeo.maru.streak.application.domain.StreakGroupByDate
+import me.daegyeo.maru.streak.application.domain.StreakRank
 import me.daegyeo.maru.streak.application.port.out.ReadAllStreakPort
 import org.springframework.stereotype.Component
 import java.util.UUID
@@ -23,5 +24,9 @@ class ReadAllStreakPersistenceAdapter(
         year: Int,
     ): List<StreakGroupByDate> {
         return streakRepository.countAllByUserIdAndCreatedAtGroupByDate(userId, year.toString())
+    }
+
+    override fun readAllStreakRankOrderByStreakDesc(year: Int): List<StreakRank> {
+        return streakRepository.findAllRankByYear(year)
     }
 }
