@@ -12,6 +12,7 @@ class UserMapper {
             email = userEntity.email,
             vendor = userEntity.vendor,
             nickname = userEntity.nickname,
+            isPublicRanking = userEntity.isPublicRanking,
             createdAt = userEntity.createdAt!!,
             updatedAt = userEntity.updatedAt!!,
             deletedAt = userEntity.deletedAt,
@@ -24,6 +25,7 @@ class UserMapper {
             email = user.email,
             vendor = user.vendor,
             nickname = user.nickname,
+            isPublicRanking = user.isPublicRanking,
             deletedAt = user.deletedAt,
         )
     }

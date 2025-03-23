@@ -9,6 +9,7 @@ data class User(
     val email: String,
     val vendor: Vendor,
     var nickname: String,
+    var isPublicRanking: Boolean,
     val createdAt: ZonedDateTime,
     val updatedAt: ZonedDateTime,
     var deletedAt: ZonedDateTime? = null,
