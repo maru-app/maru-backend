@@ -7,6 +7,7 @@ import me.daegyeo.maru.streak.application.port.`in`.GetAllStreakUseCase
 import me.daegyeo.maru.streak.application.port.`in`.GetStreakRankingUseCase
 import me.daegyeo.maru.streak.application.port.`in`.GetStreakUseCase
 import me.daegyeo.maru.streak.application.port.`in`.result.GetStreakResult
+import org.springframework.data.domain.Page
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
@@ -50,7 +51,9 @@ class StreakController(
     @GetMapping("/rank")
     fun getRanking(
         @RequestParam("year") year: Int,
-    ): List<StreakRank> {
-        return getStreakRankingUseCase.getRanking(year)
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "50") size: Int,
+    ): Page<StreakRank> {
+        return getStreakRankingUseCase.getRanking(year, page, size)
     }
 }

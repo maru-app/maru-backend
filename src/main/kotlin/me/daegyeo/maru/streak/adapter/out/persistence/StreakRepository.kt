@@ -3,6 +3,8 @@ package me.daegyeo.maru.streak.adapter.out.persistence
 import me.daegyeo.maru.streak.application.domain.StreakGroupByDate
 import me.daegyeo.maru.streak.application.domain.StreakRank
 import me.daegyeo.maru.streak.application.persistence.StreakEntity
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import java.time.ZonedDateTime
@@ -64,5 +66,8 @@ interface StreakRepository : JpaRepository<StreakEntity, Long> {
         AND EXTRACT(YEAR FROM s.createdAt) = :year
         """,
     )
-    fun findAllRankByYear(year: Int): List<StreakRank>
+    fun findAllRankByYear(
+        year: Int,
+        pageable: Pageable,
+    ): Page<StreakRank>
 }
