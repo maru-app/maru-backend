@@ -53,6 +53,7 @@ class UserUnitTest {
                 nickname = "TestUser",
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now(),
+                isPublicRanking = false,
                 deletedAt = null,
             ),
         )
@@ -77,6 +78,7 @@ class UserUnitTest {
                 nickname = "NewUser",
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now(),
+                isPublicRanking = false,
                 deletedAt = null,
             ),
         )
@@ -112,6 +114,7 @@ class UserUnitTest {
                 nickname = "FooBar",
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now(),
+                isPublicRanking = false,
                 deletedAt = null,
             ),
         )
@@ -145,6 +148,7 @@ class UserUnitTest {
                 nickname = "FooBar",
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now(),
+                isPublicRanking = false,
                 deletedAt = null,
             ),
         )
@@ -157,12 +161,12 @@ class UserUnitTest {
 
     @Test
     fun `사용자 정보를 성공적으로 수정함`() {
-        val input = UpdateUserUseCaseCommand(nickname = "NewNickname")
+        val input = UpdateUserUseCaseCommand(nickname = "NewNickname", isPublicRanking = true)
         val userId = UUID.randomUUID()
         `when`(
             updatedUserPort.updateUser(
                 userId,
-                UpdateUserDto(nickname = "NewNickname"),
+                UpdateUserDto(nickname = "NewNickname", isPublicRanking = true),
             ),
         ).thenReturn(
             User(
@@ -172,24 +176,25 @@ class UserUnitTest {
                 nickname = "NewNickname",
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now(),
+                isPublicRanking = true,
                 deletedAt = null,
             ),
         )
 
         val result = updateUserService.updateUser(userId, input)
 
-        verify(updatedUserPort).updateUser(userId, UpdateUserDto(nickname = "NewNickname"))
+        verify(updatedUserPort).updateUser(userId, UpdateUserDto(nickname = "NewNickname", isPublicRanking = true))
         assert(result.nickname == "NewNickname")
     }
 
     @Test
     fun `존재하지 않는 사용자 정보를 수정하면 오류를 반환함`() {
-        val input = UpdateUserUseCaseCommand(nickname = "NewNickname")
+        val input = UpdateUserUseCaseCommand(nickname = "NewNickname", isPublicRanking = false)
         val userId = UUID.randomUUID()
         `when`(
             updatedUserPort.updateUser(
                 userId,
-                UpdateUserDto(nickname = "NewNickname"),
+                UpdateUserDto(nickname = "NewNickname", isPublicRanking = false),
             ),
         ).thenReturn(null)
 
@@ -209,6 +214,7 @@ class UserUnitTest {
                 email = "foobar@acme.com",
                 vendor = Vendor.GOOGLE,
                 nickname = "FooBar",
+                isPublicRanking = false,
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now(),
                 deletedAt = null,

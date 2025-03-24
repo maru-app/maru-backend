@@ -16,6 +16,7 @@ class GetAuthInfoService : GetAuthInfoUseCase {
             email = customUserDetails.username,
             nickname = customUserDetails.nickname,
             vendor = customUserDetails.vendor,
+            isPublicRanking = customUserDetails.isPublicRanking,
             createdAt = customUserDetails.createdAt,
         )
     }

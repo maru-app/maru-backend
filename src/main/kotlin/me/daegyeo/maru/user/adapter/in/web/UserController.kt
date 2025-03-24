@@ -29,6 +29,7 @@ class UserController(
             auth.userId,
             UpdateUserUseCaseCommand(
                 nickname = body.nickname,
+                isPublicRanking = body.isPublicRanking,
             ),
         )
         return true

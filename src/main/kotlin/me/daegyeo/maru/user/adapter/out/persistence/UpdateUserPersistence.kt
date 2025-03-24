@@ -18,6 +18,7 @@ class UpdateUserPersistence(private val userRepository: UserRepository, private 
         val user = userRepository.findById(userId).getOrNull()
         user?.let {
             if (inputUser.nickname != null) it.nickname = inputUser.nickname
+            if (inputUser.isPublicRanking != null) it.isPublicRanking = inputUser.isPublicRanking
             return userMapper.toDomain(userRepository.save(it))
         }
         return null

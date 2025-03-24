@@ -43,6 +43,7 @@ class SecurityConfig(
                 authorize.requestMatchers("/login/oauth2/code/**").permitAll()
                 authorize.requestMatchers("/auth/register").permitAll()
                 authorize.requestMatchers("/file/webhook").permitAll()
+                authorize.requestMatchers("/streak/rank").permitAll()
                 authorize.anyRequest().authenticated()
             }
             .exceptionHandling { exception ->

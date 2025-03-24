@@ -15,7 +15,14 @@ class CustomUserDetailsService(private val getUserUseCase: GetUserUseCase) : Cus
     override fun loadUserByUsername(username: String?): UserDetails {
         try {
             val user = getUserUseCase.getUserByEmail(username!!)
-            return CustomUserDetails(user.email, user.userId, user.nickname, user.vendor, user.createdAt)
+            return CustomUserDetails(
+                user.email,
+                user.userId,
+                user.nickname,
+                user.vendor,
+                user.isPublicRanking,
+                user.createdAt,
+            )
         } catch (e: ServiceException) {
             throw UsernameNotFoundException("User not found")
         } catch (e: Exception) {

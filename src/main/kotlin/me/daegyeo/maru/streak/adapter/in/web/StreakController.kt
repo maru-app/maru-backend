@@ -2,9 +2,12 @@ package me.daegyeo.maru.streak.adapter.`in`.web
 
 import me.daegyeo.maru.auth.application.domain.CustomUserDetails
 import me.daegyeo.maru.streak.application.domain.StreakGroupByDate
+import me.daegyeo.maru.streak.application.domain.StreakRank
 import me.daegyeo.maru.streak.application.port.`in`.GetAllStreakUseCase
+import me.daegyeo.maru.streak.application.port.`in`.GetStreakRankingUseCase
 import me.daegyeo.maru.streak.application.port.`in`.GetStreakUseCase
 import me.daegyeo.maru.streak.application.port.`in`.result.GetStreakResult
+import org.springframework.data.domain.Page
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
@@ -20,6 +23,7 @@ import java.time.format.DateTimeFormatter
 class StreakController(
     private val getAllStreakUseCase: GetAllStreakUseCase,
     private val getStreakUseCase: GetStreakUseCase,
+    private val getStreakRankingUseCase: GetStreakRankingUseCase,
 ) {
     @PreAuthorize("hasRole('USER')")
     @GetMapping
@@ -42,5 +46,14 @@ class StreakController(
                 .atStartOfDay()
                 .atZone(ZoneId.systemDefault())
         return getStreakUseCase.getStreak(auth.userId, zonedDateTime)
+    }
+
+    @GetMapping("/rank")
+    fun getRanking(
+        @RequestParam("year") year: Int,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "50") size: Int,
+    ): Page<StreakRank> {
+        return getStreakRankingUseCase.getRanking(year, page, size)
     }
 }
