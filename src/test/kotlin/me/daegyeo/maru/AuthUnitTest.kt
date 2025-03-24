@@ -189,6 +189,7 @@ class AuthUnitTest {
                 userId = userId,
                 nickname = nickname,
                 vendor = vendor,
+                isPublicRanking = false,
                 createdAt = createdAt,
             )
 

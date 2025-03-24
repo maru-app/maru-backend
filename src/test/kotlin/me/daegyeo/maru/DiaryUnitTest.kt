@@ -189,6 +189,7 @@ class DiaryUnitTest {
                 email = "",
                 vendor = Vendor.GOOGLE,
                 nickname = "",
+                isPublicRanking = false,
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now(),
                 deletedAt = null,
