@@ -7,5 +7,6 @@ data class AuthInfoResult(
     val email: String,
     val nickname: String,
     val vendor: Vendor,
+    val isPublicRanking: Boolean,
     val createdAt: ZonedDateTime,
 )

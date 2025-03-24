@@ -12,6 +12,7 @@ class CustomUserDetails(
     val userId: UUID,
     val nickname: String,
     val vendor: Vendor,
+    val isPublicRanking: Boolean,
     val createdAt: ZonedDateTime,
 ) : UserDetails {
     override fun getAuthorities(): Collection<GrantedAuthority> {
