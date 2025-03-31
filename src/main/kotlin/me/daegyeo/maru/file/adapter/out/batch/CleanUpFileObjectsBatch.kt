@@ -58,6 +58,7 @@ class CleanUpFileObjectsBatch(
     fun cleanUpFileObjectsStep(): Step {
         return StepBuilder("cleanUpFileObjectsStep", jobRepository)
             .tasklet(cleanUpFileObjectsTasklet(), transactionManager)
+            .allowStartIfComplete(true)
             .build()
     }
 
