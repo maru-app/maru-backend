@@ -39,6 +39,7 @@ class DeletePendingFilesBatch(
     fun deletePendingFilesStep(): Step {
         return StepBuilder("deletePendingFilesStep", jobRepository)
             .tasklet(deletePendingFilesTasklet(), transactionManager)
+            .allowStartIfComplete(true)
             .build()
     }
 
