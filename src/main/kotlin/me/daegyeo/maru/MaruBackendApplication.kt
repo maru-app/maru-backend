@@ -1,6 +1,5 @@
 package me.daegyeo.maru
 
-import jakarta.annotation.PostConstruct
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
@@ -15,11 +14,7 @@ import java.util.TimeZone
 class MaruBackendApplication
 
 fun main(args: Array<String>) {
-    runApplication<MaruBackendApplication>(*args)
-}
-
-@PostConstruct
-fun started() {
     val tz = System.getenv("TZ") ?: "Asia/Seoul"
     TimeZone.setDefault(TimeZone.getTimeZone(tz))
+    runApplication<MaruBackendApplication>(*args)
 }
