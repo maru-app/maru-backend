@@ -8,6 +8,7 @@ data class DiaryWithUserId(
     val userId: UUID,
     var title: String,
     var content: String,
+    var emoji: String,
     val createdAt: ZonedDateTime,
     val updatedAt: ZonedDateTime,
     val deletedAt: ZonedDateTime? = null,
