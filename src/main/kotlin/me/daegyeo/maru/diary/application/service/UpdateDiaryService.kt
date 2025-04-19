@@ -9,6 +9,7 @@ import me.daegyeo.maru.diary.application.port.`in`.command.UpdateDiaryCommand
 import me.daegyeo.maru.diary.application.port.out.DeleteDiaryFilePort
 import me.daegyeo.maru.diary.application.port.out.ReadAllDiaryFilePort
 import me.daegyeo.maru.diary.application.port.out.UpdateDiaryPort
+import me.daegyeo.maru.diary.application.port.out.dto.UpdateDiaryDto
 import me.daegyeo.maru.file.application.port.out.UpdateFilePort
 import me.daegyeo.maru.file.constant.FileStatus
 import org.slf4j.LoggerFactory
@@ -53,8 +54,12 @@ class UpdateDiaryService(
         val encryptedContent = encryptDiaryUseCase.encryptDiary(input.content)
         updatedDiaryPort.updateDiary(
             diaryId = isExistsAndOwnedDiary.diaryId,
-            title = input.title,
-            content = encryptedContent,
+            input =
+                UpdateDiaryDto(
+                    title = input.title,
+                    content = encryptedContent,
+                    emoji = input.emoji,
+                ),
         )
 
         logger.info("Diary 데이터를 수정했습니다. diaryId: $diaryId")

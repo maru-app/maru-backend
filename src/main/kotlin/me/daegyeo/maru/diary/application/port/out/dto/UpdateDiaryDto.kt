@@ -1,4 +1,4 @@
-package me.daegyeo.maru.diary.adapter.`in`.web.dto
+package me.daegyeo.maru.diary.application.port.out.dto
 
 data class UpdateDiaryDto(
     val title: String,
