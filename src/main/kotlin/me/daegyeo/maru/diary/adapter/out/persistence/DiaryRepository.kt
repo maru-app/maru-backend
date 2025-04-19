@@ -10,7 +10,7 @@ import java.util.UUID
 
 interface DiaryRepository : JpaRepository<DiaryEntity, Long> {
     @Query(
-        """SELECT new me.daegyeo.maru.diary.application.domain.Diary(d.diaryId, d.title, '', d.createdAt, d.updatedAt, d.deletedAt) 
+        """SELECT new me.daegyeo.maru.diary.application.domain.Diary(d.diaryId, d.title, '', d.emoji, d.createdAt, d.updatedAt, d.deletedAt) 
             FROM DiaryEntity d 
             WHERE d.userId = :userId
             ORDER BY d.createdAt DESC""",
@@ -18,7 +18,7 @@ interface DiaryRepository : JpaRepository<DiaryEntity, Long> {
     fun findAllByUserIdExcludingContent(userId: UUID): List<Diary>
 
     @Query(
-        """SELECT new me.daegyeo.maru.diary.application.domain.Diary(d.diaryId, d.title, '', d.createdAt, d.updatedAt, d.deletedAt) 
+        """SELECT new me.daegyeo.maru.diary.application.domain.Diary(d.diaryId, d.title, '', d.emoji, d.createdAt, d.updatedAt, d.deletedAt) 
             FROM DiaryEntity d 
             WHERE d.userId = :userId""",
     )

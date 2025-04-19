@@ -18,6 +18,7 @@ class CreateDiaryPersistenceAdapter(
                 userId = input.userId,
                 title = input.title,
                 content = input.content,
+                emoji = input.emoji,
             )
 
         val savedDiary = diaryRepository.save(diary)

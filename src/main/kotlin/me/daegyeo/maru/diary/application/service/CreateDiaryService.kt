@@ -37,6 +37,7 @@ class CreateDiaryService(
                     userId = user.userId,
                     title = input.title,
                     content = encryptedContent,
+                    emoji = input.emoji,
                 ),
             )
 
