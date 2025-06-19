@@ -40,7 +40,8 @@ class UserUnitTest {
     private val createUserService = CreateUserService(createUserPort, readUserPort)
     private val getUserService = GetUserService(readUserPort)
     private val updateUserService = UpdateUserService(updatedUserPort)
-    private val deleteUserService = DeleteUserService(deleteUserPort, getUserUseCase, getAllDiaryUseCase, deleteDiaryUseCase)
+    private val deleteUserService =
+        DeleteUserService(deleteUserPort, getUserUseCase, getAllDiaryUseCase, deleteDiaryUseCase)
 
     @Test
     fun `이미 존재하는 이메일로 회원가입 시 오류를 반환함`() {
@@ -67,7 +68,8 @@ class UserUnitTest {
 
     @Test
     fun `새로운 사용자가 성공적으로 회원가입함`() {
-        val input = CreateUserUseCaseCommand(email = "newuser@example.com", vendor = Vendor.GOOGLE, nickname = "NewUser")
+        val input =
+            CreateUserUseCaseCommand(email = "newuser@example.com", vendor = Vendor.GOOGLE, nickname = "NewUser")
         `when`(readUserPort.readUserByEmail(input.email)).thenReturn(null)
         val createUserDto = CreateUserDto(email = "newuser@example.com", vendor = Vendor.GOOGLE, nickname = "NewUser")
         `when`(createUserPort.createUser(createUserDto)).thenReturn(
@@ -225,6 +227,7 @@ class UserUnitTest {
                     diaryId = 1L,
                     title = "제목",
                     content = "ENCRYPTED_CONTENT",
+                    emoji = "😊",
                     createdAt = ZonedDateTime.now(),
                     updatedAt = ZonedDateTime.now(),
                     deletedAt = null,
