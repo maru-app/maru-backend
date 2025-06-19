@@ -13,11 +13,14 @@ import java.util.UUID
 @SQLDelete(sql = "UPDATE diaries SET deleted_at = now(), content = '' WHERE diary_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 class DiaryEntity(
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "VARCHAR(256)", nullable = false)
     var title: String,
 
     @Column(columnDefinition = "TEXT", nullable = false)
     var content: String,
+
+    @Column(columnDefinition = "VARCHAR(50)", nullable = false)
+    var emoji: String,
 
     @ManyToOne(targetEntity = UserEntity::class, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false)

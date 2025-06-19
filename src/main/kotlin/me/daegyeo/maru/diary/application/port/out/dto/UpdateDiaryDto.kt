@@ -1,10 +1,7 @@
 package me.daegyeo.maru.diary.application.port.out.dto
 
-import java.util.UUID
-
-data class CreateDiaryDto(
-    val userId: UUID,
+data class UpdateDiaryDto(
     val title: String,
-    val emoji: String,
     val content: String,
+    val emoji: String,
 )

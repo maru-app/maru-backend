@@ -31,6 +31,7 @@ class GetDiaryService(private val readDiaryPort: ReadDiaryPort, private val decr
             diaryId = result.diaryId,
             title = result.title,
             content = decryptedContent,
+            emoji = result.emoji,
             createdAt = result.createdAt,
             updatedAt = result.updatedAt,
         )

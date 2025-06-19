@@ -6,4 +6,5 @@ data class CreateDiaryCommand(
     val title: String,
     val content: String,
     val userId: UUID,
+    val emoji: String,
 )

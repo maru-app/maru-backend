@@ -11,6 +11,7 @@ import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
 import me.daegyeo.maru.diary.application.port.`in`.command.UpdateDiaryCommand
 import me.daegyeo.maru.diary.application.port.out.*
 import me.daegyeo.maru.diary.application.port.out.dto.CreateDiaryFileDto
+import me.daegyeo.maru.diary.application.port.out.dto.UpdateDiaryDto
 import me.daegyeo.maru.diary.application.service.*
 import me.daegyeo.maru.file.application.domain.File
 import me.daegyeo.maru.file.application.port.out.DeleteFilePort
@@ -114,6 +115,7 @@ class DiaryUnitTest {
                 title = "FOO",
                 userId = userId,
                 content = "ENCRYPTED_CONTENT",
+                emoji = "😊",
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now(),
             )
@@ -137,6 +139,7 @@ class DiaryUnitTest {
                 title = "FOO",
                 userId = UUID.randomUUID(),
                 content = "ENCRYPTED_CONTENT",
+                emoji = "😊",
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now(),
             )
@@ -160,6 +163,7 @@ class DiaryUnitTest {
                     diaryId = 1,
                     title = "FOO",
                     content = "",
+                    emoji = "😊",
                     createdAt = ZonedDateTime.now(),
                     updatedAt = ZonedDateTime.now(),
                 ),
@@ -167,6 +171,7 @@ class DiaryUnitTest {
                     diaryId = 2,
                     title = "BAR",
                     content = "",
+                    emoji = "😊",
                     createdAt = ZonedDateTime.now(),
                     updatedAt = ZonedDateTime.now(),
                 ),
@@ -202,6 +207,7 @@ class DiaryUnitTest {
                 diaryId = 1,
                 title = title,
                 content = encryptedContent,
+                emoji = "😊",
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now(),
             )
@@ -224,7 +230,7 @@ class DiaryUnitTest {
         `when`(getImagePathInContentUseCase.getImagePathInContent(content)).thenReturn(listOf(filePath))
         `when`(readFilePort.readFileByPathAndUserId(filePath, userId)).thenReturn(file)
 
-        val result = createDiaryService.createDiary(CreateDiaryCommand(title, content, userId))
+        val result = createDiaryService.createDiary(CreateDiaryCommand(title, content, userId, "😊"))
 
         verify(getUserUseCase).getUser(userId)
         verify(encryptDiaryUseCase).encryptDiary(content)
@@ -244,6 +250,7 @@ class DiaryUnitTest {
                 diaryId = diaryId,
                 title = "PREV TITLE",
                 content = "PREV_ENCRYPTED_CONTENT",
+                emoji = "😊",
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now(),
             )
@@ -274,11 +281,11 @@ class DiaryUnitTest {
         `when`(getImagePathInContentUseCase.getImagePathInContent(updateContent)).thenReturn(listOf(newFilePath))
         `when`(readFilePort.readFileByPathAndUserId(newFilePath, userId)).thenReturn(newFile)
 
-        val result = updateDiaryService.updateDiary(diaryId, userId, UpdateDiaryCommand(title, updateContent))
+        val result = updateDiaryService.updateDiary(diaryId, userId, UpdateDiaryCommand(title, updateContent, "😊"))
 
         verify(getDiaryUseCase).getDiaryByDiaryId(diaryId, userId)
         verify(encryptDiaryUseCase).encryptDiary(updateContent)
-        verify(updateDiaryPort).updateDiary(diaryId, title, encryptedContent)
+        verify(updateDiaryPort).updateDiary(diaryId, UpdateDiaryDto(title, encryptedContent, "😊"))
         verify(deleteDiaryFilePort).deleteDiaryFile(existsFile.diaryId, existsFile.fileId)
         verify(updateFilePort).updateFileStatus(existsFile.fileId, FileStatus.ORPHANED)
 
@@ -301,7 +308,7 @@ class DiaryUnitTest {
 
         val exception =
             assertThrows(ServiceException::class.java) {
-                updateDiaryService.updateDiary(diaryId, userId, UpdateDiaryCommand(title, updateContent))
+                updateDiaryService.updateDiary(diaryId, userId, UpdateDiaryCommand(title, updateContent, "😊"))
             }
         assert(exception.error == DiaryError.DIARY_IS_NOT_OWNED)
     }
@@ -315,6 +322,7 @@ class DiaryUnitTest {
                 diaryId = diaryId,
                 title = "FOO",
                 content = "ENCRYPTED_CONTENT",
+                emoji = "😊",
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now(),
             )

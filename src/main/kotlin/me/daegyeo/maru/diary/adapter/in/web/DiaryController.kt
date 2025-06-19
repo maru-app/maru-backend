@@ -32,6 +32,7 @@ class DiaryController(
                 title = body.title,
                 content = body.content,
                 userId = auth.userId,
+                emoji = body.emoji,
             ),
         )
     }
@@ -69,6 +70,7 @@ class DiaryController(
                 UpdateDiaryCommand(
                     title = body.title,
                     content = body.content,
+                    emoji = body.emoji,
                 ),
         )
     }

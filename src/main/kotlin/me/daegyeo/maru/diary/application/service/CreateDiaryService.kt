@@ -1,6 +1,7 @@
 package me.daegyeo.maru.diary.application.service
 
 import me.daegyeo.maru.diary.application.domain.Diary
+import me.daegyeo.maru.diary.application.error.DiaryError
 import me.daegyeo.maru.diary.application.port.`in`.AttachDiaryFileFromContentUseCase
 import me.daegyeo.maru.diary.application.port.`in`.CreateDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.EncryptDiaryUseCase
@@ -8,6 +9,8 @@ import me.daegyeo.maru.diary.application.port.`in`.command.AttachDiaryFileFromCo
 import me.daegyeo.maru.diary.application.port.`in`.command.CreateDiaryCommand
 import me.daegyeo.maru.diary.application.port.out.CreateDiaryPort
 import me.daegyeo.maru.diary.application.port.out.dto.CreateDiaryDto
+import me.daegyeo.maru.diary.constant.DiaryValidation
+import me.daegyeo.maru.shared.exception.ServiceException
 import me.daegyeo.maru.streak.application.domain.event.CreatedStreakEvent
 import me.daegyeo.maru.user.application.port.`in`.GetUserUseCase
 import org.slf4j.LoggerFactory
@@ -28,6 +31,15 @@ class CreateDiaryService(
 
     @Transactional
     override fun createDiary(input: CreateDiaryCommand): Diary {
+        input.also {
+            if (it.content.length > DiaryValidation.DIARY_CONTENT_MAX_LENGTH) {
+                throw ServiceException(DiaryError.DIARY_LENGTH_EXCEEDED)
+            }
+            if (it.emoji.length > DiaryValidation.DIARY_EMOJI_MAX_LENGTH) {
+                throw ServiceException(DiaryError.DIARY_LENGTH_EXCEEDED)
+            }
+        }
+
         val user = getUserUseCase.getUser(input.userId)
 
         val encryptedContent = encryptDiaryUseCase.encryptDiary(input.content)
@@ -37,6 +49,7 @@ class CreateDiaryService(
                     userId = user.userId,
                     title = input.title,
                     content = encryptedContent,
+                    emoji = input.emoji,
                 ),
             )
 

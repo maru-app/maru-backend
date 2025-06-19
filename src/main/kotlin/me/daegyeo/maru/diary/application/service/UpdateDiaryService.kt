@@ -1,5 +1,6 @@
 package me.daegyeo.maru.diary.application.service
 
+import me.daegyeo.maru.diary.application.error.DiaryError
 import me.daegyeo.maru.diary.application.port.`in`.AttachDiaryFileFromContentUseCase
 import me.daegyeo.maru.diary.application.port.`in`.EncryptDiaryUseCase
 import me.daegyeo.maru.diary.application.port.`in`.GetDiaryUseCase
@@ -9,8 +10,11 @@ import me.daegyeo.maru.diary.application.port.`in`.command.UpdateDiaryCommand
 import me.daegyeo.maru.diary.application.port.out.DeleteDiaryFilePort
 import me.daegyeo.maru.diary.application.port.out.ReadAllDiaryFilePort
 import me.daegyeo.maru.diary.application.port.out.UpdateDiaryPort
+import me.daegyeo.maru.diary.application.port.out.dto.UpdateDiaryDto
+import me.daegyeo.maru.diary.constant.DiaryValidation
 import me.daegyeo.maru.file.application.port.out.UpdateFilePort
 import me.daegyeo.maru.file.constant.FileStatus
+import me.daegyeo.maru.shared.exception.ServiceException
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -36,6 +40,15 @@ class UpdateDiaryService(
     ): Boolean {
         val isExistsAndOwnedDiary = getDiaryUseCase.getDiaryByDiaryId(diaryId, userId)
 
+        input.also {
+            if (it.content.length > DiaryValidation.DIARY_CONTENT_MAX_LENGTH) {
+                throw ServiceException(DiaryError.DIARY_LENGTH_EXCEEDED)
+            }
+            if (it.emoji.length > DiaryValidation.DIARY_EMOJI_MAX_LENGTH) {
+                throw ServiceException(DiaryError.DIARY_LENGTH_EXCEEDED)
+            }
+        }
+
         val existsDiaryFiles = readAllDiaryFilePort.readAllDiaryFileByDiaryId(diaryId)
         existsDiaryFiles.forEach {
             deleteDiaryFilePort.deleteDiaryFile(it.diaryId, it.fileId)
@@ -53,8 +66,12 @@ class UpdateDiaryService(
         val encryptedContent = encryptDiaryUseCase.encryptDiary(input.content)
         updatedDiaryPort.updateDiary(
             diaryId = isExistsAndOwnedDiary.diaryId,
-            title = input.title,
-            content = encryptedContent,
+            input =
+                UpdateDiaryDto(
+                    title = input.title,
+                    content = encryptedContent,
+                    emoji = input.emoji,
+                ),
         )
 
         logger.info("Diary 데이터를 수정했습니다. diaryId: $diaryId")
