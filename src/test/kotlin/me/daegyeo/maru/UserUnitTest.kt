@@ -13,8 +13,7 @@ import me.daegyeo.maru.user.application.port.out.CreateUserPort
 import me.daegyeo.maru.user.application.port.out.DeleteUserPort
 import me.daegyeo.maru.user.application.port.out.ReadUserPort
 import me.daegyeo.maru.user.application.port.out.UpdateUserPort
-import me.daegyeo.maru.user.application.port.out.dto.CreateUserDto
-import me.daegyeo.maru.user.application.port.out.dto.UpdateUserDto
+import me.daegyeo.maru.user.application.port.out.command.CreateUserPortCommand
 import me.daegyeo.maru.user.application.service.CreateUserService
 import me.daegyeo.maru.user.application.service.DeleteUserService
 import me.daegyeo.maru.user.application.service.GetUserService
@@ -39,7 +38,7 @@ class UserUnitTest {
     private val deleteDiaryUseCase = mock(DeleteDiaryUseCase::class.java)
     private val createUserService = CreateUserService(createUserPort, readUserPort)
     private val getUserService = GetUserService(readUserPort)
-    private val updateUserService = UpdateUserService(updatedUserPort)
+    private val updateUserService = UpdateUserService(updatedUserPort, getUserUseCase)
     private val deleteUserService =
         DeleteUserService(deleteUserPort, getUserUseCase, getAllDiaryUseCase, deleteDiaryUseCase)
 
@@ -71,7 +70,8 @@ class UserUnitTest {
         val input =
             CreateUserUseCaseCommand(email = "newuser@example.com", vendor = Vendor.GOOGLE, nickname = "NewUser")
         `when`(readUserPort.readUserByEmail(input.email)).thenReturn(null)
-        val createUserDto = CreateUserDto(email = "newuser@example.com", vendor = Vendor.GOOGLE, nickname = "NewUser")
+        val createUserDto =
+            CreateUserPortCommand(email = "newuser@example.com", vendor = Vendor.GOOGLE, nickname = "NewUser")
         `when`(createUserPort.createUser(createUserDto)).thenReturn(
             User(
                 userId = UUID.randomUUID(),
@@ -165,12 +165,18 @@ class UserUnitTest {
     fun `사용자 정보를 성공적으로 수정함`() {
         val input = UpdateUserUseCaseCommand(nickname = "NewNickname", isPublicRanking = true)
         val userId = UUID.randomUUID()
-        `when`(
-            updatedUserPort.updateUser(
-                userId,
-                UpdateUserDto(nickname = "NewNickname", isPublicRanking = true),
-            ),
-        ).thenReturn(
+        val oldUser =
+            User(
+                userId = userId,
+                email = "",
+                vendor = Vendor.GOOGLE,
+                nickname = "OldNickname",
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+                isPublicRanking = true,
+                deletedAt = null,
+            )
+        val updatedUser =
             User(
                 userId = userId,
                 email = "",
@@ -180,12 +186,15 @@ class UserUnitTest {
                 updatedAt = ZonedDateTime.now(),
                 isPublicRanking = true,
                 deletedAt = null,
-            ),
-        )
+            )
+
+        `when`(getUserUseCase.getUser(userId)).thenReturn(oldUser)
+        `when`(updatedUserPort.updateUser(userId, oldUser)).thenReturn(updatedUser)
 
         val result = updateUserService.updateUser(userId, input)
 
-        verify(updatedUserPort).updateUser(userId, UpdateUserDto(nickname = "NewNickname", isPublicRanking = true))
+        verify(getUserUseCase).getUser(userId)
+        verify(updatedUserPort).updateUser(userId, oldUser)
         assert(result.nickname == "NewNickname")
     }
 
@@ -193,12 +202,20 @@ class UserUnitTest {
     fun `존재하지 않는 사용자 정보를 수정하면 오류를 반환함`() {
         val input = UpdateUserUseCaseCommand(nickname = "NewNickname", isPublicRanking = false)
         val userId = UUID.randomUUID()
-        `when`(
-            updatedUserPort.updateUser(
-                userId,
-                UpdateUserDto(nickname = "NewNickname", isPublicRanking = false),
-            ),
-        ).thenReturn(null)
+        val updatedUser =
+            User(
+                userId = userId,
+                email = "",
+                vendor = Vendor.GOOGLE,
+                nickname = "NOT_FOUND_USER",
+                createdAt = ZonedDateTime.now(),
+                updatedAt = ZonedDateTime.now(),
+                isPublicRanking = false,
+                deletedAt = null,
+            )
+
+        `when`(getUserUseCase.getUser(userId)).thenThrow(ServiceException(UserError.USER_NOT_FOUND))
+        `when`(updatedUserPort.updateUser(userId, updatedUser)).thenReturn(null)
 
         val exception =
             assertThrows(ServiceException::class.java) {
