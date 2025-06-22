@@ -7,7 +7,7 @@ import me.daegyeo.maru.user.application.port.`in`.CreateUserUseCase
 import me.daegyeo.maru.user.application.port.`in`.command.CreateUserUseCaseCommand
 import me.daegyeo.maru.user.application.port.out.CreateUserPort
 import me.daegyeo.maru.user.application.port.out.ReadUserPort
-import me.daegyeo.maru.user.application.port.out.dto.CreateUserDto
+import me.daegyeo.maru.user.application.port.out.command.CreateUserPortCommand
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,7 +24,7 @@ class CreateUserService(private val createUserPort: CreateUserPort, private val 
         }
 
         val createUserDto =
-            CreateUserDto(
+            CreateUserPortCommand(
                 email = input.email,
                 vendor = input.vendor,
                 nickname = input.nickname,
