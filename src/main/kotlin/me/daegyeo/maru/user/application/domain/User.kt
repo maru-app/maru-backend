@@ -23,10 +23,6 @@ class User(
         this.isPublicRanking = !this.isPublicRanking
     }
 
-    fun markAsDeleted() {
-        this.deletedAt = ZonedDateTime.now()
-    }
-
     fun toEntity(): UserEntity {
         return UserEntity(
             userId = this.userId,
