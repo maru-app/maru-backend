@@ -21,13 +21,13 @@ class DeleteUserService(
 
     @Transactional
     override fun deleteUser(userId: UUID) {
-        val isExistsUser = getUserUseCase.getUser(userId)
+        val user = getUserUseCase.getUser(userId)
 
-        val diaries = getAllDiaryUseCase.getAllDiaryByUserId(isExistsUser.userId)
+        val diaries = getAllDiaryUseCase.getAllDiaryByUserId(user.userId)
         diaries.forEach {
-            deleteDiaryUseCase.deleteDiary(it.diaryId, isExistsUser.userId)
+            deleteDiaryUseCase.deleteDiary(it.diaryId, user.userId)
         }
-        deleteUserPort.deleteUser(isExistsUser.userId)
+        deleteUserPort.deleteUser(user.userId)
 
         logger.info("User 데이터를 삭제하고 탈퇴했습니다. $userId")
     }

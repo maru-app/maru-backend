@@ -13,15 +13,14 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class CreateUserService(private val createUserPort: CreateUserPort, private val readUserPort: ReadUserPort) : CreateUserUseCase {
+class CreateUserService(private val createUserPort: CreateUserPort, private val readUserPort: ReadUserPort) :
+    CreateUserUseCase {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     @Transactional
     override fun createUser(input: CreateUserUseCaseCommand): User {
-        val existsUser = readUserPort.readUserByEmail(input.email)
-
-        if (existsUser != null) {
-            throw ServiceException(UserError.USER_ALREADY_EXISTS)
+        readUserPort.readUserByEmail(input.email).let {
+            if (it != null) throw ServiceException(UserError.USER_ALREADY_EXISTS)
         }
 
         val createUserDto =
