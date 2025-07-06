@@ -14,6 +14,6 @@ EXPOSE 8080
 
 VOLUME ["/logs"]
 
-RUN wget -O dd-java-agent.jar 'https://dtdg.co/latest-java-tracer'
+RUN mkdir -p /opt/datadog && wget -O /opt/datadog/dd-java-agent.jar 'https://dtdg.co/latest-java-tracer'
 
-ENTRYPOINT ["java", "-javaagent:dd-java-agent.jar", "-Ddd.profiling.enabled=true", "-XX:FlightRecorderOptions=stackdepth=256", "-Ddd.logs.injection=true", "-Ddd.service=maru-backend", "-Ddd.env=prod", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-javaagent:/opt/datadog/dd-java-agent.jar", "-Ddd.profiling.enabled=true", "-XX:FlightRecorderOptions=stackdepth=256", "-Ddd.logs.injection=true", "-Ddd.service=maru-backend", "-Ddd.env=prod", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
