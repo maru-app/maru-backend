@@ -5,11 +5,11 @@ WORKDIR /workspace
 
 RUN chmod +x gradlew && ./gradlew clean build
 
-FROM --platform=linux/arm64 eclipse-temurin:17
+FROM eclipse-temurin:17
 
 COPY --from=builder /workspace/build/libs/maru-0.0.1-SNAPSHOT.jar ./app.jar
 
-ENV TZ Asia/Seoul
+ENV TZ=Asia/Seoul
 EXPOSE 8080
 
 VOLUME ["/logs"]
