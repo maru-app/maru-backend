@@ -14,4 +14,6 @@ EXPOSE 8080
 
 VOLUME ["/logs"]
 
-ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
+RUN wget -O dd-java-agent.jar 'https://dtdg.co/latest-java-tracer'
+
+ENTRYPOINT ["java", "-javaagent:dd-java-agent.jar", "-Ddd.profiling.enabled=true", "-XX:FlightRecorderOptions=stackdepth=256", "-Ddd.logs.injection=true", "-Ddd.service=maru-backend", "-Ddd.env=prod", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
